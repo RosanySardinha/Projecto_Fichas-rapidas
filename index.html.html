@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zona Fichas Rápidas - Leitor OCR</title>
+  
+  <!-- Tesseract.js para OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #1a2a3a; margin: 0; padding: 0; display: flex; justify-content: center; }
+    
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: #f4f6f9;
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      padding-bottom: 70px;
+    }
+
+    .top-bar {
+      background: #1160d2;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .top-bar .brand { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+
+    .ocr-card {
+      background: white;
+      margin: 12px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e1e8ed;
+    }
+
+    .btn-group { display: flex; gap: 10px; margin-bottom: 8px; }
+    .ocr-btn {
+      flex: 1; padding: 12px 8px; background: #1160d2; color: white;
+      border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
+      font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .ocr-btn-secondary { background: #4b6584; }
+    .ocr-btn-capture { background: #e74c3c; margin-top: 8px; }
+    .ocr-btn:hover { opacity: 0.9; }
+
+    #ocr-status { font-size: 12px; color: #555; text-align: center; margin-top: 8px; font-weight: 500; }
+
+    #camera-stream { width: 100%; border-radius: 8px; margin-top: 10px; display: none; background: #000; }
+    #preview-canvas { display: none; }
+    #preview-img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #ddd; }
+
+    .section-title { font-size: 12px; color: #777; text-align: center; margin: 15px 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .league-list { padding: 0 12px; }
+    .league-card {
+      background: white; border-radius: 8px; padding: 12px 15px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; transition: background 0.2s;
+    }
+    .league-card:hover { background: #eef4fc; }
+    .league-info { display: flex; align-items: center; gap: 12px; }
+    
+    .league-flag {
+      width: 32px;
+      height: 24px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .league-name { font-weight: bold; font-size: 14px; color: #222; }
+    .league-sub { font-size: 11px; color: #888; }
+    .badge-games { background: #eef4fc; color: #1160d2; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 12px; }
+
+    .games-container { display: none; margin-bottom: 10px; padding: 0 5px; }
+    .game-item { background: #ffffff; border-left: 4px solid #1160d2; border-radius: 6px; padding: 10px; margin-top: 6px; font-size: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .game-header { display: flex; justify-content: space-between; color: #555; margin-bottom: 4px; }
+    .game-teams { font-weight: bold; font-size: 13px; color: #111; }
+    .game-odds { display: flex; gap: 8px; margin-top: 6px; }
+    .odd-box { flex: 1; background: #f0f4f8; text-align: center; padding: 4px; border-radius: 4px; font-weight: bold; color: #1160d2; }
+
+    .results-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    .results-table th { background: #f0f3f8; padding: 8px; text-align: left; color: #555; }
+    .results-table td { padding: 8px; border-bottom: 1px solid #eee; }
+    .tag-match { background: #e2f0d9; color: #2e6b12; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; display: inline-block; }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; width: 100%; max-width: 480px; height: 55px;
+      background: #1160d2; display: flex; justify-content: space-around; align-items: center; color: white; font-size: 11px;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; opacity: 0.8; cursor: pointer; }
+    .nav-item.active { opacity: 1; font-weight: bold; }
+    
+    .qr-fab {
+      position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+      width: 50px; height: 50px; background: #ff007a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(255,0,122,0.4); cursor: pointer; z-index: 101;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="top-bar">
+      <div class="brand"><span>⚽ Zona Fichas Rápidas</span></div>
+      <span>🔍</span>
+    </div>
+
+    <!-- Módulo OCR e Câmara -->
+    <div class="ocr-card">
+      <div class="btn-group">
+        <button class="ocr-btn" onclick="iniciarCamara()">📸 Abrir Câmara</button>
+        <button class="ocr-btn ocr-btn-secondary" onclick="document.getElementById('gallery-input').click()">🖼️ Carregar Foto</button>
+      </div>
+
+      <input type="file" id="gallery-input" accept="image/*" style="display:none;" onchange="processarFicheiro(event)">
+
+      <video id="camera-stream" autoplay playsinline></video>
+      <button id="btn-capturar" class="ocr-btn ocr-btn-capture" style="display:none;" onclick="tirarFotoECorrerOCR()">🔴 Disparar Foto</button>
+
+      <canvas id="preview-canvas"></canvas>
+      <img id="preview-img" alt="Foto tirada">
+
+      <div id="ocr-status">Escreva no papel no formato <strong>Jogo.Prognóstico</strong> (ex: <code>1001.1</code> ou <code>2001.X2</code>)</div>
+
+      <table class="results-table" id="table-results" style="display:none;">
+        <thead>
+          <tr>
+            <th>Cód.</th>
+            <th>Jogo / Liga</th>
+            <th>Prognóstico Escolhido</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Melhores Competições</div>
+    <div class="league-list">
+      
+      <!-- 1º LUGAR: Liga dos Campeões UEFA -->
+      <div class="league-card" onclick="toggleLiga('liga-uefa')">
+        <div class="league-info">
+          <img class="league-flag" src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Europe.svg" alt="UEFA">
+          <div>
+            <div class="league-name">Liga dos Campeões UEFA</div>
+            <div class="league-sub">Futebol - Clubes Internacionais</div>
+          </div>
+        </div>
+        <span class="badge-games">2 jogos</span>
+      </div>
+      <div class="games-container" id="liga-uefa">
+        <div class="game-item">
+          <div class="game-header"><span>Cód: <strong>1001</strong></span> <span>Hoje 20:00</span></div>
+          <div class="game-teams">Real Madrid vs Bayern Munique</div>
+          <div class="game-odds"><div class="odd-box">1: 2.10</div><div class="odd-box">X: 3.40</div><div class="odd-box">2: 3.10</div></div>
+        </div>
+        <div class="game-item">
+          <div class="game-header"><span>Cód: <strong>1002</strong></span> <span>Hoje 20:00</span></div>
+          <div class="game-teams">PSG vs Borussia Dortmund</div>
+          <div class="game-odds"><div class="odd-box">1: 1.85</div><div class="odd-box">X: 3.60</div><div class="odd-box">2: 4.20</div></div>
+        </div>
+      </div>
+
+      <!-- 2º LUGAR: Girabola Angola -->
+      <div class="league-card" onclick="toggleLiga('liga-girabola')">
+        <div class="league-info">
+          <img class="league-flag" src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Angola.svg" alt="Angola">
+          <div>
+            <div class="league-name">Girabola Angola</div>
+            <div class="league-sub">Futebol - Angola</div>
+          </div>
+        </div>
+        <span class="badge-games">2 jogos</span>
+      </div>
+      <div class="games-container" id="liga-girabola">
+        <div class="game-item">
+          <div class="game-header"><span>Cód: <strong>2001</strong></span> <span>Sábado 16:00</span></div>
+          <div class="game-teams">Petro de Luanda vs 1º de Agosto</div>
+          <div class="game-odds"><div class="odd-box">1: 1.90</div><div class="odd-box">X: 3.00</div><div class="odd-box">2: 3.80</div></div>
+        </div>
+        <div class="game-item">
+          <div class="game-header"><span>Cód: <strong>2002</strong></span> <span>Sábado 15:30</span></div>
+          <div class="game-teams">Sagrada Esperança vs Interclube</div>
+          <div class="game-odds"><div class="odd-box">1: 2.05</div><div class="odd-box">X: 2.90</div><div class="odd-box">2: 3.50</div></div>
+        </div>
+      </div>
+
+      <!-- Premier League -->
+      <div class="league-card" onclick="toggleLiga('liga-premier')">
+        <div class="league-info">
+          <img class="league-flag" src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg" alt="Inglaterra">
+          <div>
+            <div class="league-name">Premier League</div>
+            <div class="league-sub">Futebol - Inglaterra</div>
+          </div>
+        </div>
+        <span class="badge-games">8 jogos</span>
+      </div>
+      <div class="games-container" id="liga-premier">
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4001</strong></span> <span>Hoje 15:00</span></div><div class="game-teams">Arsenal vs Chelsea</div><div class="game-odds"><div class="odd-box">1: 1.80</div><div class="odd-box">X: 3.50</div><div class="odd-box">2: 4.20</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4002</strong></span> <span>Hoje 17:30</span></div><div class="game-teams">Man. City vs Liverpool</div><div class="game-odds"><div class="odd-box">1: 2.10</div><div class="odd-box">X: 3.40</div><div class="odd-box">2: 3.10</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4003</strong></span> <span>Sábado 14:00</span></div><div class="game-teams">Man. United vs Tottenham</div><div class="game-odds"><div class="odd-box">1: 2.25</div><div class="odd-box">X: 3.30</div><div class="odd-box">2: 2.90</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4004</strong></span> <span>Sábado 16:30</span></div><div class="game-teams">Newcastle vs Aston Villa</div><div class="game-odds"><div class="odd-box">1: 1.95</div><div class="odd-box">X: 3.40</div><div class="odd-box">2: 3.60</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4005</strong></span> <span>Domingo 14:00</span></div><div class="game-teams">West Ham vs Everton</div><div class="game-odds"><div class="odd-box">1: 2.05</div><div class="odd-box">X: 3.20</div><div class="odd-box">2: 3.40</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4006</strong></span> <span>Domingo 16:30</span></div><div class="game-teams">Brighton vs Fulham</div><div class="game-odds"><div class="odd-box">1: 1.90</div><div class="odd-box">X: 3.30</div><div class="odd-box">2: 3.80</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4007</strong></span> <span>Segunda 20:00</span></div><div class="game-teams">Wolves vs Crystal Palace</div><div class="game-odds"><div class="odd-box">1: 2.40</div><div class="odd-box">X: 3.10</div><div class="odd-box">2: 2.80</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>4008</strong></span> <span>Segunda 20:00</span></div><div class="game-teams">Brentford vs Bournemouth</div><div class="game-odds"><div class="odd-box">1: 2.15</div><div class="odd-box">X: 3.30</div><div class="odd-box">2: 3.20</div></div></div>
+      </div>
+
+      <!-- La Liga -->
+      <div class="league-card" onclick="toggleLiga('liga-laliga')">
+        <div class="league-info">
+          <img class="league-flag" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg" alt="Espanha">
+          <div>
+            <div class="league-name">La Liga</div>
+            <div class="league-sub">Futebol - Espanha</div>
+          </div>
+        </div>
+        <span class="badge-games">8 jogos</span>
+      </div>
+      <div class="games-container" id="liga-laliga">
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5001</strong></span> <span>Hoje 20:00</span></div><div class="game-teams">Real Madrid vs Barcelona</div><div class="game-odds"><div class="odd-box">1: 2.05</div><div class="odd-box">X: 3.60</div><div class="odd-box">2: 3.20</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5002</strong></span> <span>Sábado 15:00</span></div><div class="game-teams">Atlético Madrid vs Sevilla</div><div class="game-odds"><div class="odd-box">1: 1.70</div><div class="odd-box">X: 3.60</div><div class="odd-box">2: 4.80</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5003</strong></span> <span>Sábado 17:15</span></div><div class="game-teams">Real Betis vs Valencia</div><div class="game-odds"><div class="odd-box">1: 2.10</div><div class="odd-box">X: 3.20</div><div class="odd-box">2: 3.40</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5004</strong></span> <span>Sábado 20:00</span></div><div class="game-teams">Athletic Bilbao vs Real Sociedad</div><div class="game-odds"><div class="odd-box">1: 2.30</div><div class="odd-box">X: 3.10</div><div class="odd-box">2: 3.00</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5005</strong></span> <span>Domingo 13:00</span></div><div class="game-teams">Villarreal vs Girona</div><div class="game-odds"><div class="odd-box">1: 2.15</div><div class="odd-box">X: 3.40</div><div class="odd-box">2: 3.10</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5006</strong></span> <span>Domingo 15:15</span></div><div class="game-teams">Osasuna vs Celta de Vigo</div><div class="game-odds"><div class="odd-box">1: 2.45</div><div class="odd-box">X: 3.10</div><div class="odd-box">2: 2.85</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5007</strong></span> <span>Domingo 17:30</span></div><div class="game-teams">Rayo Vallecano vs Mallorca</div><div class="game-odds"><div class="odd-box">1: 2.20</div><div class="odd-box">X: 3.00</div><div class="odd-box">2: 3.30</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>5008</strong></span> <span>Domingo 20:00</span></div><div class="game-teams">Getafe vs Espanyol</div><div class="game-odds"><div class="odd-box">1: 2.00</div><div class="odd-box">X: 3.00</div><div class="odd-box">2: 4.00</div></div></div>
+      </div>
+
+      <!-- Liga Portugal -->
+      <div class="league-card" onclick="toggleLiga('liga-portugal')">
+        <div class="league-info">
+          <img class="league-flag" src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg" alt="Portugal">
+          <div>
+            <div class="league-name">Liga Portugal</div>
+            <div class="league-sub">Futebol - Portugal</div>
+          </div>
+        </div>
+        <span class="badge-games">8 jogos</span>
+      </div>
+      <div class="games-container" id="liga-portugal">
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6001</strong></span> <span>Sábado 20:30</span></div><div class="game-teams">Benfica vs FC Porto</div><div class="game-odds"><div class="odd-box">1: 2.30</div><div class="odd-box">X: 3.25</div><div class="odd-box">2: 2.90</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6002</strong></span> <span>Domingo 18:00</span></div><div class="game-teams">Sporting CP vs SC Braga</div><div class="game-odds"><div class="odd-box">1: 1.75</div><div class="odd-box">X: 3.60</div><div class="odd-box">2: 4.20</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6003</strong></span> <span>Sábado 15:30</span></div><div class="game-teams">Vitoria SC vs Boavista</div><div class="game-odds"><div class="odd-box">1: 1.85</div><div class="odd-box">X: 3.40</div><div class="odd-box">2: 4.00</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6004</strong></span> <span>Sábado 18:00</span></div><div class="game-teams">Famalicão vs Rio Ave</div><div class="game-odds"><div class="odd-box">1: 2.10</div><div class="odd-box">X: 3.10</div><div class="odd-box">2: 3.40</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6005</strong></span> <span>Domingo 15:30</span></div><div class="game-teams">Gil Vicente vs Arouca</div><div class="game-odds"><div class="odd-box">1: 2.25</div><div class="odd-box">X: 3.20</div><div class="odd-box">2: 3.10</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6006</strong></span> <span>Domingo 20:30</span></div><div class="game-teams">Moreirense vs Estoril</div><div class="game-odds"><div class="odd-box">1: 2.00</div><div class="odd-box">X: 3.25</div><div class="odd-box">2: 3.60</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6007</strong></span> <span>Segunda 18:45</span></div><div class="game-teams">Farense vs Casa Pia</div><div class="game-odds"><div class="odd-box">1: 2.35</div><div class="odd-box">X: 3.00</div><div class="odd-box">2: 3.00</div></div></div>
+        <div class="game-item"><div class="game-header"><span>Cód: <strong>6008</strong></span> <span>Segunda 20:45</span></div><div class="game-teams">AVS vs Santa Clara</div><div class="game-odds"><div class="odd-box">1: 2.50</div><div class="odd-box">X: 2.95</div><div class="odd-box">2: 2.80</div></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="qr-fab" onclick="iniciarCamara()">
+    <span style="color:white; font-size:22px; font-weight:bold;">📸</span>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active">🏠<br>Home</div>
+    <div class="nav-item">⚽<br>Desportos</div>
+    <div class="nav-item">📅<br>Calendário</div>
+    <div class="nav-item">📋<br>Fichas</div>
+  </div>
+
+  <script>
+    // BANCO DE JOGOS
+    const BANCO_DE_JOGOS = {
+      // LIGA DOS CAMPEÕES
+      "1001": { liga: "Liga dos Campeões", jogo: "Real Madrid vs Bayern" },
+      "1002": { liga: "Liga dos Campeões", jogo: "PSG vs Dortmund" },
+      
+      // GIRABOLA ANGOLA
+      "2001": { liga: "Girabola Angola", jogo: "Petro de Luanda vs 1º de Agosto" },
+      "2002": { liga: "Girabola Angola", jogo: "Sagrada Esperança vs Interclube" },
+
+      // PREMIER LEAGUE
+      "4001": { liga: "Premier League", jogo: "Arsenal vs Chelsea" },
+      "4002": { liga: "Premier League", jogo: "Man. City vs Liverpool" },
+      "4003": { liga: "Premier League", jogo: "Man. United vs Tottenham" },
+      "4004": { liga: "Premier League", jogo: "Newcastle vs Aston Villa" },
+      "4005": { liga: "Premier League", jogo: "West Ham vs Everton" },
+      "4006": { liga: "Premier League", jogo: "Brighton vs Fulham" },
+      "4007": { liga: "Premier League", jogo: "Wolves vs Crystal Palace" },
+      "4008": { liga: "Premier League", jogo: "Brentford vs Bournemouth" },
+
+      // LA LIGA
+      "5001": { liga: "La Liga", jogo: "Real Madrid vs Barcelona" },
+      "5002": { liga: "La Liga", jogo: "Atlético Madrid vs Sevilla" },
+      "5003": { liga: "La Liga", jogo: "Real Betis vs Valencia" },
+      "5004": { liga: "La Liga", jogo: "Athletic Bilbao vs Real Sociedad" },
+      "5005": { liga: "La Liga", jogo: "Villarreal vs Girona" },
+      "5006": { liga: "La Liga", jogo: "Osasuna vs Celta de Vigo" },
+      "5007": { liga: "La Liga", jogo: "Rayo Vallecano vs Mallorca" },
+      "5008": { liga: "La Liga", jogo: "Getafe vs Espanyol" },
+
+      // LIGA PORTUGAL
+      "6001": { liga: "Liga Portugal", jogo: "Benfica vs FC Porto" },
+      "6002": { liga: "Liga Portugal", jogo: "Sporting CP vs SC Braga" },
+      "6003": { liga: "Liga Portugal", jogo: "Vitoria SC vs Boavista" },
+      "6004": { liga: "Liga Portugal", jogo: "Famalicão vs Rio Ave" },
+      "6005": { liga: "Liga Portugal", jogo: "Gil Vicente vs Arouca" },
+      "6006": { liga: "Liga Portugal", jogo: "Moreirense vs Estoril" },
+      "6007": { liga: "Liga Portugal", jogo: "Farense vs Casa Pia" },
+      "6008": { liga: "Liga Portugal", jogo: "AVS vs Santa Clara" }
+    };
+
+    let streamAtivo = null;
+
+    function toggleLiga(idLiga) {
+      const el = document.getElementById(idLiga);
+      el.style.display = (el.style.display === "block") ? "none" : "block";
+    }
+
+    async function iniciarCamara() {
+      const video = document.getElementById('camera-stream');
+      const btnCapturar = document.getElementById('btn-capturar');
+      const status = document.getElementById('ocr-status');
+      const preview = document.getElementById('preview-img');
+
+      preview.style.display = 'none';
+
+      try {
+        streamAtivo = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: "environment" } }
+        });
+      } catch (err) {
+        try {
+          streamAtivo = await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (e) {
+          status.innerText = "Erro ao aceder à câmara. Permita o acesso nas definições.";
+          return;
+        }
+      }
+
+      video.srcObject = streamAtivo;
+      video.style.display = 'block';
+      btnCapturar.style.display = 'block';
+      status.innerText = "Aponte para o papel com os jogos no formato Jogo.Prognostico (ex: 1001.1 ou 2001.X2).";
+    }
+
+    function tirarFotoECorrerOCR() {
+      const video = document.getElementById('camera-stream');
+      const canvas = document.getElementById('preview-canvas');
+      const preview = document.getElementById('preview-img');
+      const btnCapturar = document.getElementById('btn-capturar');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      if (streamAtivo) {
+        streamAtivo.getTracks().forEach(track => track.stop());
+      }
+      video.style.display = 'none';
+      btnCapturar.style.display = 'none';
+
+      const dataUrl = canvas.toDataURL('image/png');
+      preview.src = dataUrl;
+      preview.style.display = 'block';
+
+      executarOCR(dataUrl);
+    }
+
+    function processarFicheiro(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('preview-img');
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+
+      executarOCR(file);
+    }
+
+    function executarOCR(fonteImagem) {
+      const status = document.getElementById('ocr-status');
+      const table = document.getElementById('table-results');
+      const body = document.getElementById('results-body');
+
+      status.innerText = "A processar fotografia com OCR...";
+      body.innerHTML = "";
+      table.style.display = "none";
+
+      Tesseract.recognize(fonteImagem, 'por', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            status.innerText = `A ler foto: ${Math.round((m.progress || 0) * 100)}%`;
+          }
+        }
+      }).then(({ data: { text } }) => {
+        status.innerText = "Leitura concluída!";
+        buscarEExibirJogos(text);
+      }).catch(err => {
+        console.error(err);
+        status.innerText = "Erro ao ler a imagem. Tente com melhor iluminação.";
+      });
+    }
+
+    // LÓGICA DO "Jogo.Prognostico" (Ex: 1001.1, 2001.X2, 4001.GG)
+    function buscarEExibirJogos(textoLido) {
+      const table = document.getElementById('table-results');
+      const body = document.getElementById('results-body');
+      const status = document.getElementById('ocr-status');
+      
+      let encontrouAlgum = false;
+      
+      // Regra de busca: Procura 4 números + PONTO + Palpite
+      const regex = /\b(\d{4})\.([A-Za-z0-9]+)\b/g;
+      let match;
+
+      while ((match = regex.exec(textoLido)) !== null) {
+        const cod = match[1];           // Código de 4 dígitos (ex: 1001)
+        const prognostico = match[2];    // O palpite que vem a seguir ao ponto (ex: 1, X2, GG)
+
+        if (BANCO_DE_JOGOS[cod]) {
+          encontrouAlgum = true;
+          const dados = BANCO_DE_JOGOS[cod];
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${cod}</strong></td>
+            <td>
+              <div style="font-weight:bold; color:#1160d2;">${dados.jogo}</div>
+              <div style="font-size:10px; color:#777;">${dados.liga}</div>
+            </td>
+            <td><span class="tag-match">${prognostico.toUpperCase()}</span></td>
+          `;
+          body.appendChild(tr);
+        }
+      }
+
+      if (encontrouAlgum) {
+        status.innerText = "Jogos e prognósticos identificados com sucesso!";
+        table.style.display = "table";
+      } else {
+        status.innerText = "Nenhum jogo no formato 'Código.Prognóstico' (ex: 1001.1) foi encontrado.";
+      }
+    }
+  </script>
+</body>
+</html>
