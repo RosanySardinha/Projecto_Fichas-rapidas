@@ -31,7 +31,6 @@
     #preview { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd; object-fit: contain; }
     #status { margin-top: 8px; font-size: 0.85rem; color: #666; font-weight: 500; }
     
-    /* CARTÕES DAS LIGAS (FECHADOS POR PADRÃO) */
     .league-card { background: #0056b3; color: white; border-radius: 10px; padding: 14px 15px; margin-top: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .league-card:active { background: #004494; }
     .league-matches { display: none; margin-top: 10px; }
@@ -46,15 +45,12 @@
     .odd-btn:hover { background-color: #e9ecef; }
     .odd-btn.selected { background-color: #28a745 !important; color: white !important; border-color: #28a745 !important; }
 
-    /* ESTILOS DA ABA DESPORTOS */
     .sport-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
     .sport-item:hover { background: #f8f9fa; }
 
-    /* ESTILOS DA ABA CALENDÁRIO */
     .calendar-event { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     .calendar-date { font-weight: bold; color: #0056b3; font-size: 0.8rem; margin-bottom: 4px; }
 
-    /* PAINEL DA FICHA SIMULADA */
     .betslip-card { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 12px; padding: 15px; margin-top: 10px; }
     .betslip-header { font-weight: bold; font-size: 1.1rem; color: #856404; margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #ffeeba; padding-bottom: 8px; }
     .betslip-items { font-size: 0.85rem; color: #333; margin-bottom: 15px; max-height: 250px; overflow-y: auto; }
@@ -63,7 +59,6 @@
     .betslip-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; font-weight: bold; }
     .betslip-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-weight: bold; text-align: right; margin-top: 5px; }
 
-    /* MENU NAVEGAÇÃO INFERIOR */
     nav { position: fixed; bottom: 0; width: 100%; background: #0056b3; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); z-index: 100; }
     nav button { background: none; border: none; color: white; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.7; position: relative; }
     nav button.active { opacity: 1; font-weight: bold; }
@@ -81,7 +76,6 @@
 
   <div class="container">
     
-    <!-- ABA HOME (LEITOR E LIGAS) -->
     <div id="tab-home" class="tab-content active">
       <div class="card">
         <div class="btn-group">
@@ -95,12 +89,12 @@
 
         <div id="preview-container">
           <img id="preview" alt="Pré-visualização">
-          <div id="status">A câmara está ativa. Aguardando captura...</div>
+          <div id="status">Aguardando captura...</div>
           <button class="btn btn-secondary" style="margin: 10px auto 0 auto; width: 120px;" onclick="hideCamera()">Fechar</button>
         </div>
       </div>
 
-      <!-- LIGA DOS CAMPEÕES -->
+      <!-- LIGAS -->
       <div class="league-card" onclick="toggleLeague('champions-list')">
         <span>🇪🇺 Liga dos Campeões UEFA (8 Jogos)</span>
         <span id="icon-champions-list">▲</span>
@@ -116,7 +110,6 @@
         <div class="match-card" data-code="1008" data-teams="FC Porto vs Napoli"><div class="match-header"><span>Cód: <b>1008</b></span><span>Amanhã 21:00</span></div><div class="match-teams">FC Porto vs Napoli</div><div class="odds-group"><div class="odd-btn" data-odd="2.60" onclick="toggleOdd(this, '1008', '1')">1: 2.60</div><div class="odd-btn" data-odd="3.20" onclick="toggleOdd(this, '1008', 'X')">X: 3.20</div><div class="odd-btn" data-odd="2.70" onclick="toggleOdd(this, '1008', '2')">2: 2.70</div></div></div>
       </div>
 
-      <!-- PREMIER LEAGUE -->
       <div class="league-card" onclick="toggleLeague('premier-list')">
         <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League (8 Jogos)</span>
         <span id="icon-premier-list">▲</span>
@@ -132,7 +125,6 @@
         <div class="match-card" data-code="3008" data-teams="Crystal Palace vs Leicester"><div class="match-header"><span>Cód: <b>3008</b></span><span>Segunda 20:00</span></div><div class="match-teams">Crystal Palace vs Leicester City</div><div class="odds-group"><div class="odd-btn" data-odd="2.10" onclick="toggleOdd(this, '3008', '1')">1: 2.10</div><div class="odd-btn" data-odd="3.25" onclick="toggleOdd(this, '3008', 'X')">X: 3.25</div><div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '3008', '2')">2: 3.40</div></div></div>
       </div>
 
-      <!-- LALIGA ESPANHA -->
       <div class="league-card" onclick="toggleLeague('laliga-list')">
         <span>🇪🇸 LaLiga Espanha (8 Jogos)</span>
         <span id="icon-laliga-list">▲</span>
@@ -148,7 +140,6 @@
         <div class="match-card" data-code="4008" data-teams="Mallorca vs Espanyol"><div class="match-header"><span>Cód: <b>4008</b></span><span>Segunda 21:00</span></div><div class="match-teams">Mallorca vs Espanyol</div><div class="odds-group"><div class="odd-btn" data-odd="2.00" onclick="toggleOdd(this, '4008', '1')">1: 2.00</div><div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '4008', 'X')">X: 3.10</div><div class="odd-btn" data-odd="3.90" onclick="toggleOdd(this, '4008', '2')">2: 3.90</div></div></div>
       </div>
 
-      <!-- LIGA PORTUGAL -->
       <div class="league-card" onclick="toggleLeague('ligapt-list')">
         <span>🇵🇹 Liga Portugal (8 Jogos)</span>
         <span id="icon-ligapt-list">▲</span>
@@ -164,7 +155,6 @@
         <div class="match-card" data-code="5008" data-teams="AVS vs Santa Clara"><div class="match-header"><span>Cód: <b>5008</b></span><span>Segunda 20:15</span></div><div class="match-teams">AVS Futebol SAD vs Santa Clara</div><div class="odds-group"><div class="odd-btn" data-odd="2.50" onclick="toggleOdd(this, '5008', '1')">1: 2.50</div><div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '5008', 'X')">X: 3.00</div><div class="odd-btn" data-odd="2.80" onclick="toggleOdd(this, '5008', '2')">2: 2.80</div></div></div>
       </div>
 
-      <!-- GIRABOLA ANGOLA -->
       <div class="league-card" onclick="toggleLeague('girabola-list')">
         <span>🇦🇴 Girabola Angola (8 Jogos)</span>
         <span id="icon-girabola-list">▲</span>
@@ -181,7 +171,7 @@
       </div>
     </div>
 
-    <!-- ABA DESPORTOS (5 MODALIDADES) -->
+    <!-- ABA DESPORTOS -->
     <div id="tab-sports" class="tab-content">
       <div class="card">
         <h3>🏅 Modalidades Disponíveis</h3>
@@ -273,7 +263,6 @@
 
   </div>
 
-  <!-- MENU INFERIOR NAVEGÁVEL -->
   <nav>
     <button id="nav-home" class="active" onclick="switchTab('home')">🏠<span>Home</span></button>
     <button id="nav-sports" onclick="switchTab('sports')">⚽<span>Desportos</span></button>
@@ -289,7 +278,6 @@
     let selectedBets = {}; 
     let activeTab = 'home';
 
-    // Ação do Botão Voltar Superior
     function goBack() {
       const previewContainer = document.getElementById('preview-container');
       if (previewContainer.style.display === 'block') {
@@ -302,7 +290,6 @@
       }
     }
 
-    // Alternar entre abas do menu
     function switchTab(tabName) {
       activeTab = tabName;
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -312,7 +299,6 @@
       document.getElementById(`nav-${tabName}`).classList.add('active');
     }
 
-    // Expandir / Ocultar Liga ao tocar
     function toggleLeague(id) {
       const list = document.getElementById(id);
       const icon = document.getElementById(`icon-${id}`);
@@ -330,7 +316,6 @@
       document.getElementById('status').innerText = 'Câmara fechada.';
     }
 
-    // Seleção de prognóstico
     function toggleOdd(element, code, outcome) {
       const matchCard = document.querySelector(`.match-card[data-code="${code}"]`);
       const teams = matchCard.getAttribute('data-teams');
@@ -353,7 +338,6 @@
       calculateBetslip();
     }
 
-    // Recalcular ficha simulada na aba "Fichas"
     function calculateBetslip() {
       const itemsContainer = document.getElementById('betslip-items');
       const slipCount = document.getElementById('slip-count');
@@ -421,13 +405,12 @@
 
       preview.src = URL.createObjectURL(file);
       previewContainer.style.display = 'block';
-      status.innerText = '⏳ A otimizar imagem...';
-
-      const processedImageData = await preprocessImage(preview);
-
-      status.innerText = '🔍 A analisar a ficha...';
+      status.innerText = '⚡ Otimizando imagem...';
 
       try {
+        const processedImageData = await preprocessImage(preview);
+        status.innerText = '🔍 Lendo códigos...';
+
         await initOCR();
         const { data: { text } } = await worker.recognize(processedImageData);
 
@@ -435,35 +418,55 @@
         parseAndHighlight(text);
       } catch (err) {
         console.error(err);
-        status.innerText = '❌ Erro ao ler imagem.';
+        status.innerText = '❌ Erro ao ler imagem. Tente uma foto mais aproximada.';
       }
     }
 
+    // OTIMIZAÇÃO DE PERFORMANCE PARA EVITAR CRASH
     function preprocessImage(imgElement) {
       return new Promise((resolve) => {
         imgElement.onload = () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           
-          const scale = 3; 
-          canvas.width = imgElement.naturalWidth * scale;
-          canvas.height = imgElement.naturalHeight * scale;
+          // Redimensionar para tamanho máximo seguro de 1000px (evita falta de memória)
+          let width = imgElement.naturalWidth;
+          let height = imgElement.naturalHeight;
+          const maxDim = 1000;
 
-          ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
 
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          canvas.width = width;
+          canvas.height = height;
+
+          ctx.drawImage(imgElement, 0, 0, width, height);
+
+          const imgData = ctx.getImageData(0, 0, width, height);
           const d = imgData.data;
 
+          // Filtro B&W leve
           for (let i = 0; i < d.length; i += 4) {
             let avg = (d[i] + d[i + 1] + d[i + 2]) / 3;
-            let val = avg < 145 ? 0 : 255; 
-            d[i] = val;
-            d[i + 1] = val;
-            d[i + 2] = val;
+            let val = avg < 130 ? 0 : 255; 
+            d[i] = d[i + 1] = d[i + 2] = val;
           }
 
           ctx.putImageData(imgData, 0, 0);
-          resolve(canvas.toDataURL());
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          
+          // Limpeza manual de memória
+          canvas.width = 0;
+          canvas.height = 0;
+
+          resolve(dataUrl);
         };
 
         if (imgElement.complete) imgElement.onload();
@@ -494,10 +497,10 @@
       }
 
       if (newMatchesCount > 0) {
-        status.innerHTML = `✅ +${newMatchesCount} prognósticos adicionados! Consulta a aba <b>Fichas</b>.`;
+        status.innerHTML = `✅ +${newMatchesCount} jogos identificados! Ver aba <b>Fichas</b>.`;
         status.style.color = '#28a745';
       } else {
-        status.innerText = "⚠️ Nenhum jogo reconhecido. Tente com mais iluminação.";
+        status.innerText = "⚠️ Nenhum código reconhecido. Tire uma foto mais focada nos números.";
         status.style.color = '#dc3545';
       }
     }
