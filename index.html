@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zona Fichas Rápidas - Elephant Bet</title>
+  <title>Zona Fichas Rápidas</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f4f6f9; color: #333; padding-bottom: 90px; }
+    body { background-color: #f4f6f9; color: #333; padding-bottom: 80px; }
     
-    header { background-color: #0056b3; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); sticky: top; }
+    header { background-color: #0056b3; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; }
     .btn-back { background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
     .btn-back:active { background: rgba(255, 255, 255, 0.4); }
     header h1 { font-size: 1.1rem; }
     
     .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
     .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 15px; }
     
     .btn-group { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -28,9 +31,9 @@
     #preview { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd; object-fit: contain; }
     #status { margin-top: 8px; font-size: 0.85rem; color: #666; font-weight: 500; }
     
-    /* LIGAS CLÁSSICAS (ACORDEÃO) */
-    .league-card { background: #0056b3; color: white; border-radius: 10px; padding: 12px 15px; margin-top: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .league-card:hover { background: #004494; }
+    /* CARTÕES DAS LIGAS (FECHADOS POR PADRÃO) */
+    .league-card { background: #0056b3; color: white; border-radius: 10px; padding: 14px 15px; margin-top: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .league-card:active { background: #004494; }
     .league-matches { display: none; margin-top: 10px; }
     .league-matches.active { display: block; }
 
@@ -43,18 +46,20 @@
     .odd-btn:hover { background-color: #e9ecef; }
     .odd-btn.selected { background-color: #28a745 !important; color: white !important; border-color: #28a745 !important; }
 
-    /* PAINEL DA FICHA SIMULADA */
-    .betslip-card { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 12px; padding: 15px; margin-top: 20px; }
-    .betslip-header { font-weight: bold; font-size: 1rem; color: #856404; margin-bottom: 10px; display: flex; justify-content: space-between; }
-    .betslip-items { font-size: 0.85rem; color: #333; margin-bottom: 10px; max-height: 150px; overflow-y: auto; }
-    .betslip-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #e6dbb8; }
-    .betslip-calc { background: white; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba; }
-    .betslip-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.85rem; font-weight: bold; }
+    /* PAINEL DA FICHA SIMULADA (NA ABA "FICHAS") */
+    .betslip-card { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 12px; padding: 15px; margin-top: 10px; }
+    .betslip-header { font-weight: bold; font-size: 1.1rem; color: #856404; margin-bottom: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #ffeeba; padding-bottom: 8px; }
+    .betslip-items { font-size: 0.85rem; color: #333; margin-bottom: 15px; max-height: 250px; overflow-y: auto; }
+    .betslip-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e6dbb8; }
+    .betslip-calc { background: white; padding: 12px; border-radius: 8px; border: 1px solid #ffeeba; }
+    .betslip-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; font-weight: bold; }
     .betslip-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-weight: bold; text-align: right; margin-top: 5px; }
 
+    /* MENU NAVEGAÇÃO INFERIOR */
     nav { position: fixed; bottom: 0; width: 100%; background: #0056b3; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); z-index: 100; }
-    nav button { background: none; border: none; color: white; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.8; }
+    nav button { background: none; border: none; color: white; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; opacity: 0.7; position: relative; }
     nav button.active { opacity: 1; font-weight: bold; }
+    .badge { position: absolute; top: -4px; right: 8px; background: #dc3545; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
     input[type="file"] { display: none; }
   </style>
 </head>
@@ -68,243 +73,275 @@
 
   <div class="container">
     
-    <!-- ÁREA DA CÂMARA / LEITOR -->
-    <div class="card">
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="document.getElementById('camera-input').click()">📸 Tirar Foto (+1)</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">🖼️ Galeria</button>
-        <button class="btn btn-danger" onclick="resetBetSlip()">🗑️ Limpar Ficha</button>
+    <!-- ABA HOME (LEITOR E LIGAS) -->
+    <div id="tab-home" class="tab-content active">
+      <div class="card">
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="document.getElementById('camera-input').click()">📸 Tirar Foto (+1)</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">🖼️ Galeria</button>
+          <button class="btn btn-danger" onclick="resetBetSlip()">🗑️ Limpar Ficha</button>
+        </div>
+
+        <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="processImage(this)">
+        <input type="file" id="file-input" accept="image/*" onchange="processImage(this)">
+
+        <div id="preview-container">
+          <img id="preview" alt="Pré-visualização">
+          <div id="status">A câmara está ativa. Aguardando captura...</div>
+          <button class="btn btn-secondary" style="margin: 10px auto 0 auto; width: 120px;" onclick="hideCamera()">Fechar</button>
+        </div>
       </div>
 
-      <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="processImage(this)">
-      <input type="file" id="file-input" accept="image/*" onchange="processImage(this)">
+      <!-- LIGA DOS CAMPEÕES (FECHADA POR PADRÃO) -->
+      <div class="league-card" onclick="toggleLeague('champions-list')">
+        <span>🇪🇺 Liga dos Campeões UEFA (8 Jogos)</span>
+        <span id="icon-champions-list">▲</span>
+      </div>
 
-      <div id="preview-container">
-        <img id="preview" alt="Pré-visualização">
-        <div id="status">A câmara está ativa. Aguardando captura de imagem...</div>
-        <button class="btn btn-secondary" style="margin: 10px auto 0 auto; width: 120px;" onclick="hideCamera()">Fechar Câmara</button>
+      <div id="champions-list" class="league-matches">
+        <div class="match-card" data-code="1001" data-teams="Real Madrid vs Bayern">
+          <div class="match-header"><span>Cód: <b>1001</b></span><span>Hoje 20:00</span></div>
+          <div class="match-teams">Real Madrid vs Bayern Munique</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.10" onclick="toggleOdd(this, '1001', '1')">1: 2.10</div>
+            <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '1001', 'X')">X: 3.40</div>
+            <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '1001', '2')">2: 3.10</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1002" data-teams="PSG vs Borussia Dortmund">
+          <div class="match-header"><span>Cód: <b>1002</b></span><span>Hoje 20:00</span></div>
+          <div class="match-teams">PSG vs Borussia Dortmund</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.85" onclick="toggleOdd(this, '1002', '1')">1: 1.85</div>
+            <div class="odd-btn" data-odd="3.60" onclick="toggleOdd(this, '1002', 'X')">X: 3.60</div>
+            <div class="odd-btn" data-odd="4.20" onclick="toggleOdd(this, '1002', '2')">2: 4.20</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1003" data-teams="Man City vs Inter">
+          <div class="match-header"><span>Cód: <b>1003</b></span><span>Hoje 21:00</span></div>
+          <div class="match-teams">Manchester City vs Inter de Milão</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.50" onclick="toggleOdd(this, '1003', '1')">1: 1.50</div>
+            <div class="odd-btn" data-odd="4.20" onclick="toggleOdd(this, '1003', 'X')">X: 4.20</div>
+            <div class="odd-btn" data-odd="6.00" onclick="toggleOdd(this, '1003', '2')">2: 6.00</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1004" data-teams="Barcelona vs Arsenal">
+          <div class="match-header"><span>Cód: <b>1004</b></span><span>Hoje 21:00</span></div>
+          <div class="match-teams">Barcelona vs Arsenal</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.25" onclick="toggleOdd(this, '1004', '1')">1: 2.25</div>
+            <div class="odd-btn" data-odd="3.30" onclick="toggleOdd(this, '1004', 'X')">X: 3.30</div>
+            <div class="odd-btn" data-odd="2.90" onclick="toggleOdd(this, '1004', '2')">2: 2.90</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1005" data-teams="Atlético vs Juventus">
+          <div class="match-header"><span>Cód: <b>1005</b></span><span>Amanhã 19:00</span></div>
+          <div class="match-teams">Atlético de Madrid vs Juventus</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.05" onclick="toggleOdd(this, '1005', '1')">1: 2.05</div>
+            <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '1005', 'X')">X: 3.10</div>
+            <div class="odd-btn" data-odd="3.60" onclick="toggleOdd(this, '1005', '2')">2: 3.60</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1006" data-teams="Leverkusen vs AC Milan">
+          <div class="match-header"><span>Cód: <b>1006</b></span><span>Amanhã 20:00</span></div>
+          <div class="match-teams">Bayer Leverkusen vs AC Milan</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.95" onclick="toggleOdd(this, '1006', '1')">1: 1.95</div>
+            <div class="odd-btn" data-odd="3.50" onclick="toggleOdd(this, '1006', 'X')">X: 3.50</div>
+            <div class="odd-btn" data-odd="3.75" onclick="toggleOdd(this, '1006', '2')">2: 3.75</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1007" data-teams="Benfica vs Liverpool">
+          <div class="match-header"><span>Cód: <b>1007</b></span><span>Amanhã 21:00</span></div>
+          <div class="match-teams">Benfica vs Liverpool</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '1007', '1')">1: 3.40</div>
+            <div class="odd-btn" data-odd="3.60" onclick="toggleOdd(this, '1007', 'X')">X: 3.60</div>
+            <div class="odd-btn" data-odd="2.00" onclick="toggleOdd(this, '1007', '2')">2: 2.00</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="1008" data-teams="FC Porto vs Napoli">
+          <div class="match-header"><span>Cód: <b>1008</b></span><span>Amanhã 21:00</span></div>
+          <div class="match-teams">FC Porto vs Napoli</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.60" onclick="toggleOdd(this, '1008', '1')">1: 2.60</div>
+            <div class="odd-btn" data-odd="3.20" onclick="toggleOdd(this, '1008', 'X')">X: 3.20</div>
+            <div class="odd-btn" data-odd="2.70" onclick="toggleOdd(this, '1008', '2')">2: 2.70</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GIRABOLA ANGOLA (FECHADA POR PADRÃO) -->
+      <div class="league-card" onclick="toggleLeague('girabola-list')">
+        <span>🇦🇴 Girabola Angola (8 Jogos)</span>
+        <span id="icon-girabola-list">▲</span>
+      </div>
+
+      <div id="girabola-list" class="league-matches">
+        <div class="match-card" data-code="2001" data-teams="Petro vs 1º de Agosto">
+          <div class="match-header"><span>Cód: <b>2001</b></span><span>Amanhã 16:00</span></div>
+          <div class="match-teams">Petro de Luanda vs 1º de Agosto</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.90" onclick="toggleOdd(this, '2001', '1')">1: 1.90</div>
+            <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '2001', 'X')">X: 3.10</div>
+            <div class="odd-btn" data-odd="3.80" onclick="toggleOdd(this, '2001', '2')">2: 3.80</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2002" data-teams="Sagrada vs Interclube">
+          <div class="match-header"><span>Cód: <b>2002</b></span><span>Amanhã 15:30</span></div>
+          <div class="match-teams">Sagrada Esperança vs Interclube</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.10" onclick="toggleOdd(this, '2002', '1')">1: 2.10</div>
+            <div class="odd-btn" data-odd="2.95" onclick="toggleOdd(this, '2002', 'X')">X: 2.95</div>
+            <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '2002', '2')">2: 3.40</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2003" data-teams="Kabuscorp vs Académica Lobito">
+          <div class="match-header"><span>Cód: <b>2003</b></span><span>Sábado 15:00</span></div>
+          <div class="match-teams">Kabuscorp vs Académica do Lobito</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.75" onclick="toggleOdd(this, '2003', '1')">1: 1.75</div>
+            <div class="odd-btn" data-odd="3.20" onclick="toggleOdd(this, '2003', 'X')">X: 3.20</div>
+            <div class="odd-btn" data-odd="4.50" onclick="toggleOdd(this, '2003', '2')">2: 4.50</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2004" data-teams="Wiliete vs Bravos do Maquis">
+          <div class="match-header"><span>Cód: <b>2004</b></span><span>Sábado 15:30</span></div>
+          <div class="match-teams">Wiliete de Benguela vs Bravos do Maquis</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.20" onclick="toggleOdd(this, '2004', '1')">1: 2.20</div>
+            <div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '2004', 'X')">X: 3.00</div>
+            <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '2004', '2')">2: 3.10</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2005" data-teams="Desp. Huíla vs Rec. Libolo">
+          <div class="match-header"><span>Cód: <b>2005</b></span><span>Domingo 15:00</span></div>
+          <div class="match-teams">Desportivo da Huíla vs Recreativo do Libolo</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.85" onclick="toggleOdd(this, '2005', '1')">1: 1.85</div>
+            <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '2005', 'X')">X: 3.10</div>
+            <div class="odd-btn" data-odd="4.00" onclick="toggleOdd(this, '2005', '2')">2: 4.00</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2006" data-teams="Santa Rita vs São Salvador">
+          <div class="match-header"><span>Cód: <b>2006</b></span><span>Domingo 15:30</span></div>
+          <div class="match-teams">Santa Rita de Cássia vs São Salvador do Zaire</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.30" onclick="toggleOdd(this, '2006', '1')">1: 2.30</div>
+            <div class="odd-btn" data-odd="2.90" onclick="toggleOdd(this, '2006', 'X')">X: 2.90</div>
+            <div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '2006', '2')">2: 3.00</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2007" data-teams="Lunda Sul vs Isaac Benguela">
+          <div class="match-header"><span>Cód: <b>2007</b></span><span>Domingo 16:00</span></div>
+          <div class="match-teams">CD Lunda Sul vs Isaac de Benguela</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="1.60" onclick="toggleOdd(this, '2007', '1')">1: 1.60</div>
+            <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '2007', 'X')">X: 3.40</div>
+            <div class="odd-btn" data-odd="5.20" onclick="toggleOdd(this, '2007', '2')">2: 5.20</div>
+          </div>
+        </div>
+
+        <div class="match-card" data-code="2008" data-teams="Luanda City vs Carmona FC">
+          <div class="match-header"><span>Cód: <b>2008</b></span><span>Domingo 16:00</span></div>
+          <div class="match-teams">Luanda City vs Carmona FC</div>
+          <div class="odds-group">
+            <div class="odd-btn" data-odd="2.40" onclick="toggleOdd(this, '2008', '1')">1: 2.40</div>
+            <div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '2008', 'X')">X: 3.00</div>
+            <div class="odd-btn" data-odd="2.80" onclick="toggleOdd(this, '2008', '2')">2: 2.80</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- FICHA SIMULADA DE APOSTAS -->
-    <div class="betslip-card">
-      <div class="betslip-header">
-        <span>📋 Ficha Simulada</span>
-        <span id="slip-count">0 jogo(s)</span>
-      </div>
-      
-      <div class="betslip-items" id="betslip-items">
-        <div style="color: #856404; font-style: italic;">Nenhum jogo selecionado. Toque nos prognósticos ou tire foto à ficha.</div>
-      </div>
-
-      <div class="betslip-calc">
-        <div class="betslip-row">
-          <span>Odd Total:</span>
-          <span id="total-odd" style="color: #0d6efd;">1.00</span>
-        </div>
-        <div class="betslip-row">
-          <span>Valor da Aposta (AOA):</span>
-        </div>
-        <input type="number" id="stake-input" class="betslip-input" value="500" min="100" step="100" oninput="calculateBetslip()">
-        <hr style="margin: 8px 0; border: 0; border-top: 1px solid #eee;">
-        <div class="betslip-row" style="font-size: 0.95rem; color: #28a745;">
-          <span>Ganhos Possíveis:</span>
-          <span id="potential-win">0.00 AOA</span>
-        </div>
+    <!-- ABA DESPORTOS (INFORMATIVA) -->
+    <div id="tab-sports" class="tab-content">
+      <div class="card">
+        <h3>⚽ Desportos Disponíveis</h3>
+        <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">Selecione o desporto para visualizar os jogos disponíveis na sua zona.</p>
       </div>
     </div>
 
-    <!-- LIGA DOS CAMPEÕES (8 JOGOS) -->
-    <div class="league-card" onclick="toggleLeague('champions-list')">
-      <span>🇪🇺 Liga dos Campeões UEFA (8 Jogos)</span>
-      <span id="icon-champions-list">▼</span>
-    </div>
-
-    <div id="champions-list" class="league-matches active">
-      <div class="match-card" data-code="1001" data-teams="Real Madrid vs Bayern">
-        <div class="match-header"><span>Cód: <b>1001</b></span><span>Hoje 20:00</span></div>
-        <div class="match-teams">Real Madrid vs Bayern Munique</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.10" onclick="toggleOdd(this, '1001', '1')">1: 2.10</div>
-          <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '1001', 'X')">X: 3.40</div>
-          <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '1001', '2')">2: 3.10</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1002" data-teams="PSG vs Borussia Dortmund">
-        <div class="match-header"><span>Cód: <b>1002</b></span><span>Hoje 20:00</span></div>
-        <div class="match-teams">PSG vs Borussia Dortmund</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.85" onclick="toggleOdd(this, '1002', '1')">1: 1.85</div>
-          <div class="odd-btn" data-odd="3.60" onclick="toggleOdd(this, '1002', 'X')">X: 3.60</div>
-          <div class="odd-btn" data-odd="4.20" onclick="toggleOdd(this, '1002', '2')">2: 4.20</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1003" data-teams="Man City vs Inter">
-        <div class="match-header"><span>Cód: <b>1003</b></span><span>Hoje 21:00</span></div>
-        <div class="match-teams">Manchester City vs Inter de Milão</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.50" onclick="toggleOdd(this, '1003', '1')">1: 1.50</div>
-          <div class="odd-btn" data-odd="4.20" onclick="toggleOdd(this, '1003', 'X')">X: 4.20</div>
-          <div class="odd-btn" data-odd="6.00" onclick="toggleOdd(this, '1003', '2')">2: 6.00</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1004" data-teams="Barcelona vs Arsenal">
-        <div class="match-header"><span>Cód: <b>1004</b></span><span>Hoje 21:00</span></div>
-        <div class="match-teams">Barcelona vs Arsenal</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.25" onclick="toggleOdd(this, '1004', '1')">1: 2.25</div>
-          <div class="odd-btn" data-odd="3.30" onclick="toggleOdd(this, '1004', 'X')">X: 3.30</div>
-          <div class="odd-btn" data-odd="2.90" onclick="toggleOdd(this, '1004', '2')">2: 2.90</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1005" data-teams="Atlético vs Juventus">
-        <div class="match-header"><span>Cód: <b>1005</b></span><span>Amanhã 19:00</span></div>
-        <div class="match-teams">Atlético de Madrid vs Juventus</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.05" onclick="toggleOdd(this, '1005', '1')">1: 2.05</div>
-          <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '1005', 'X')">X: 3.10</div>
-          <div class="odd-btn" data-odd="3.60" onclick="toggleOdd(this, '1005', '2')">2: 3.60</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1006" data-teams="Leverkusen vs AC Milan">
-        <div class="match-header"><span>Cód: <b>1006</b></span><span>Amanhã 20:00</span></div>
-        <div class="match-teams">Bayer Leverkusen vs AC Milan</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.95" onclick="toggleOdd(this, '1006', '1')">1: 1.95</div>
-          <div class="odd-btn" data-odd="3.50" onclick="toggleOdd(this, '1006', 'X')">X: 3.50</div>
-          <div class="odd-btn" data-odd="3.75" onclick="toggleOdd(this, '1006', '2')">2: 3.75</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1007" data-teams="Benfica vs Liverpool">
-        <div class="match-header"><span>Cód: <b>1007</b></span><span>Amanhã 21:00</span></div>
-        <div class="match-teams">Benfica vs Liverpool</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '1007', '1')">1: 3.40</div>
-          <div class="odd-btn" data-odd="3.60" onclick="toggleOdd(this, '1007', 'X')">X: 3.60</div>
-          <div class="odd-btn" data-odd="2.00" onclick="toggleOdd(this, '1007', '2')">2: 2.00</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="1008" data-teams="FC Porto vs Napoli">
-        <div class="match-header"><span>Cód: <b>1008</b></span><span>Amanhã 21:00</span></div>
-        <div class="match-teams">FC Porto vs Napoli</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.60" onclick="toggleOdd(this, '1008', '1')">1: 2.60</div>
-          <div class="odd-btn" data-odd="3.20" onclick="toggleOdd(this, '1008', 'X')">X: 3.20</div>
-          <div class="odd-btn" data-odd="2.70" onclick="toggleOdd(this, '1008', '2')">2: 2.70</div>
-        </div>
+    <!-- ABA CALENDÁRIO -->
+    <div id="tab-calendar" class="tab-content">
+      <div class="card">
+        <h3>📅 Calendário de Jogos</h3>
+        <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">Acompanhe as próximas jornadas da Liga dos Campeões e Girabola.</p>
       </div>
     </div>
 
-
-    <!-- GIRABOLA ANGOLA (8 JOGOS) -->
-    <div class="league-card" onclick="toggleLeague('girabola-list')">
-      <span>🇦🇴 Girabola Angola (8 Jogos)</span>
-      <span id="icon-girabola-list">▼</span>
-    </div>
-
-    <div id="girabola-list" class="league-matches active">
-      <div class="match-card" data-code="2001" data-teams="Petro vs 1º de Agosto">
-        <div class="match-header"><span>Cód: <b>2001</b></span><span>Amanhã 16:00</span></div>
-        <div class="match-teams">Petro de Luanda vs 1º de Agosto</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.90" onclick="toggleOdd(this, '2001', '1')">1: 1.90</div>
-          <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '2001', 'X')">X: 3.10</div>
-          <div class="odd-btn" data-odd="3.80" onclick="toggleOdd(this, '2001', '2')">2: 3.80</div>
+    <!-- ABA FICHAS (AQUI FICA A FICHA SIMULADA) -->
+    <div id="tab-betslip" class="tab-content">
+      <div class="betslip-card">
+        <div class="betslip-header">
+          <span>📋 Ficha Simulada</span>
+          <span id="slip-count">0 jogo(s)</span>
         </div>
-      </div>
-
-      <div class="match-card" data-code="2002" data-teams="Sagrada vs Interclube">
-        <div class="match-header"><span>Cód: <b>2002</b></span><span>Amanhã 15:30</span></div>
-        <div class="match-teams">Sagrada Esperança vs Interclube</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.10" onclick="toggleOdd(this, '2002', '1')">1: 2.10</div>
-          <div class="odd-btn" data-odd="2.95" onclick="toggleOdd(this, '2002', 'X')">X: 2.95</div>
-          <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '2002', '2')">2: 3.40</div>
+        
+        <div class="betslip-items" id="betslip-items">
+          <div style="color: #856404; font-style: italic;">Nenhum jogo selecionado. Toque nos prognósticos na Home ou carregue uma imagem da ficha.</div>
         </div>
-      </div>
 
-      <div class="match-card" data-code="2003" data-teams="Kabuscorp vs Académica Lobito">
-        <div class="match-header"><span>Cód: <b>2003</b></span><span>Sábado 15:00</span></div>
-        <div class="match-teams">Kabuscorp vs Académica do Lobito</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.75" onclick="toggleOdd(this, '2003', '1')">1: 1.75</div>
-          <div class="odd-btn" data-odd="3.20" onclick="toggleOdd(this, '2003', 'X')">X: 3.20</div>
-          <div class="odd-btn" data-odd="4.50" onclick="toggleOdd(this, '2003', '2')">2: 4.50</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="2004" data-teams="Wiliete vs Bravos do Maquis">
-        <div class="match-header"><span>Cód: <b>2004</b></span><span>Sábado 15:30</span></div>
-        <div class="match-teams">Wiliete de Benguela vs Bravos do Maquis</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.20" onclick="toggleOdd(this, '2004', '1')">1: 2.20</div>
-          <div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '2004', 'X')">X: 3.00</div>
-          <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '2004', '2')">2: 3.10</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="2005" data-teams="Desp. Huíla vs Rec. Libolo">
-        <div class="match-header"><span>Cód: <b>2005</b></span><span>Domingo 15:00</span></div>
-        <div class="match-teams">Desportivo da Huíla vs Recreativo do Libolo</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.85" onclick="toggleOdd(this, '2005', '1')">1: 1.85</div>
-          <div class="odd-btn" data-odd="3.10" onclick="toggleOdd(this, '2005', 'X')">X: 3.10</div>
-          <div class="odd-btn" data-odd="4.00" onclick="toggleOdd(this, '2005', '2')">2: 4.00</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="2006" data-teams="Santa Rita vs São Salvador">
-        <div class="match-header"><span>Cód: <b>2006</b></span><span>Domingo 15:30</span></div>
-        <div class="match-teams">Santa Rita de Cássia vs São Salvador do Zaire</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.30" onclick="toggleOdd(this, '2006', '1')">1: 2.30</div>
-          <div class="odd-btn" data-odd="2.90" onclick="toggleOdd(this, '2006', 'X')">X: 2.90</div>
-          <div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '2006', '2')">2: 3.00</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="2007" data-teams="Lunda Sul vs Isaac Benguela">
-        <div class="match-header"><span>Cód: <b>2007</b></span><span>Domingo 16:00</span></div>
-        <div class="match-teams">CD Lunda Sul vs Isaac de Benguela</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="1.60" onclick="toggleOdd(this, '2007', '1')">1: 1.60</div>
-          <div class="odd-btn" data-odd="3.40" onclick="toggleOdd(this, '2007', 'X')">X: 3.40</div>
-          <div class="odd-btn" data-odd="5.20" onclick="toggleOdd(this, '2007', '2')">2: 5.20</div>
-        </div>
-      </div>
-
-      <div class="match-card" data-code="2008" data-teams="Luanda City vs Carmona FC">
-        <div class="match-header"><span>Cód: <b>2008</b></span><span>Domingo 16:00</span></div>
-        <div class="match-teams">Luanda City vs Carmona FC</div>
-        <div class="odds-group">
-          <div class="odd-btn" data-odd="2.40" onclick="toggleOdd(this, '2008', '1')">1: 2.40</div>
-          <div class="odd-btn" data-odd="3.00" onclick="toggleOdd(this, '2008', 'X')">X: 3.00</div>
-          <div class="odd-btn" data-odd="2.80" onclick="toggleOdd(this, '2008', '2')">2: 2.80</div>
+        <div class="betslip-calc">
+          <div class="betslip-row">
+            <span>Odd Total:</span>
+            <span id="total-odd" style="color: #0d6efd;">1.00</span>
+          </div>
+          <div class="betslip-row" style="margin-top: 10px;">
+            <span>Valor da Aposta (AOA):</span>
+          </div>
+          <input type="number" id="stake-input" class="betslip-input" value="500" min="100" step="100" oninput="calculateBetslip()">
+          <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
+          <div class="betslip-row" style="font-size: 1rem; color: #28a745;">
+            <span>Ganhos Possíveis:</span>
+            <span id="potential-win">0.00 AOA</span>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
 
+  <!-- MENU INFERIOR NAVEGÁVEL -->
   <nav>
-    <button class="active">🏠<span>Home</span></button>
-    <button>⚽<span>Desportos</span></button>
-    <button>📅<span>Calendário</span></button>
-    <button>📋<span>Fichas</span></button>
+    <button id="nav-home" class="active" onclick="switchTab('home')">🏠<span>Home</span></button>
+    <button id="nav-sports" onclick="switchTab('sports')">⚽<span>Desportos</span></button>
+    <button id="nav-calendar" onclick="switchTab('calendar')">📅<span>Calendário</span></button>
+    <button id="nav-betslip" onclick="switchTab('betslip')">
+      📋<span>Fichas</span>
+      <span id="betslip-badge" class="badge" style="display: none;">0</span>
+    </button>
   </nav>
 
   <script>
     let worker = null;
-    let selectedBets = {}; // Guarda as apostas ativas: { "1001": { outcome: "1", odd: 2.10, teams: "..." } }
+    let selectedBets = {}; 
 
-    // Mostrar/Ocultar Ligas
+    // Alternar entre abas do menu
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      document.getElementById(`nav-${tabName}`).classList.add('active');
+    }
+
+    // Expandir / Ocultar Liga ao tocar
     function toggleLeague(id) {
       const list = document.getElementById(id);
       const icon = document.getElementById(`icon-${id}`);
@@ -317,24 +354,21 @@
       }
     }
 
-    // Fechar visualização da câmara ao clicar em "Voltar"
     function hideCamera() {
       document.getElementById('preview-container').style.display = 'none';
       document.getElementById('status').innerText = 'Câmara fechada.';
     }
 
-    // Seleção manual ou via OCR do botão de prognóstico
+    // Seleção de prognóstico
     function toggleOdd(element, code, outcome) {
       const matchCard = document.querySelector(`.match-card[data-code="${code}"]`);
       const teams = matchCard.getAttribute('data-teams');
       const oddValue = parseFloat(element.getAttribute('data-odd'));
 
-      // Se já estava selecionado este mesmo botão, desmarca
       if (element.classList.contains('selected')) {
         element.classList.remove('selected');
         delete selectedBets[code];
       } else {
-        // Desmarca outros botões do mesmo jogo
         matchCard.querySelectorAll('.odd-btn').forEach(btn => btn.classList.remove('selected'));
         element.classList.add('selected');
         
@@ -348,19 +382,27 @@
       calculateBetslip();
     }
 
-    // Atualiza a Ficha Simulada e recalcula Odds e Ganhos
+    // Recalcular ficha simulada na aba "Fichas"
     function calculateBetslip() {
       const itemsContainer = document.getElementById('betslip-items');
       const slipCount = document.getElementById('slip-count');
       const totalOddElem = document.getElementById('total-odd');
       const potentialWinElem = document.getElementById('potential-win');
       const stakeInput = document.getElementById('stake-input');
+      const badge = document.getElementById('betslip-badge');
 
       const codes = Object.keys(selectedBets);
       slipCount.innerText = `${codes.length} jogo(s)`;
 
+      if (codes.length > 0) {
+        badge.innerText = codes.length;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+
       if (codes.length === 0) {
-        itemsContainer.innerHTML = '<div style="color: #856404; font-style: italic;">Nenhum jogo selecionado. Toque nos prognósticos ou tire foto à ficha.</div>';
+        itemsContainer.innerHTML = '<div style="color: #856404; font-style: italic;">Nenhum jogo selecionado. Toque nos prognósticos na Home ou carregue uma imagem da ficha.</div>';
         totalOddElem.innerText = '1.00';
         potentialWinElem.innerText = '0.00 AOA';
         return;
@@ -408,11 +450,11 @@
 
       preview.src = URL.createObjectURL(file);
       previewContainer.style.display = 'block';
-      status.innerText = '⏳ A processar imagem e nitidez...';
+      status.innerText = '⏳ A otimizar imagem...';
 
       const processedImageData = await preprocessImage(preview);
 
-      status.innerText = '🔍 A analisar a ficha com OCR...';
+      status.innerText = '🔍 A analisar a ficha...';
 
       try {
         await initOCR();
@@ -422,7 +464,7 @@
         parseAndHighlight(text);
       } catch (err) {
         console.error(err);
-        status.innerText = '❌ Erro ao ler a imagem. Tente novamente.';
+        status.innerText = '❌ Erro ao ler imagem.';
       }
     }
 
@@ -481,10 +523,10 @@
       }
 
       if (newMatchesCount > 0) {
-        status.innerHTML = `✅ Adicionados +${newMatchesCount} prognósticos à ficha simulada!`;
+        status.innerHTML = `✅ +${newMatchesCount} prognósticos adicionados! Consulta a aba <b>Fichas</b>.`;
         status.style.color = '#28a745';
       } else {
-        status.innerText = "⚠️ Nenhum jogo reconhecido na foto. Tente aproximação com boa iluminação.";
+        status.innerText = "⚠️ Nenhum jogo reconhecido. Tente com mais iluminação.";
         status.style.color = '#dc3545';
       }
     }
@@ -495,9 +537,10 @@
       document.getElementById('preview-container').style.display = 'none';
       calculateBetslip();
       const status = document.getElementById('status');
-      status.innerText = '🗑️ Ficha simulada limpa com sucesso!';
+      status.innerText = '🗑️ Ficha limpa!';
       status.style.color = '#0d6efd';
     }
   </script>
 </body>
 </html>
+     
