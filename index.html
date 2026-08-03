@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #0d2342; /* Azul escuro do fundo */
+            background-color: #0d2342;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -24,6 +24,7 @@
         .app-card {
             width: 100%;
             max-width: 420px;
+            height: 720px;
             background-color: #eef2f5;
             border-radius: 20px;
             overflow: hidden;
@@ -37,45 +38,54 @@
         .app-header {
             background-color: #0066ff;
             color: white;
-            padding: 15px 20px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 10;
         }
 
         .app-header .title {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
         }
 
-        .app-header .search-icon {
+        .btn-back {
+            background: none;
+            border: none;
+            color: white;
             font-size: 1.2rem;
             cursor: pointer;
+            margin-right: 8px;
+            display: none;
         }
 
         /* Conteúdo Principal */
         .app-body {
-            padding: 16px;
+            padding: 15px;
             flex: 1;
-            padding-bottom: 70px; /* espaço para a bottom bar */
+            overflow-y: auto;
+            padding-bottom: 75px;
         }
 
-        /* Grid de Botões no Topo */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .btn-action {
             border: none;
             border-radius: 10px;
             padding: 12px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: white;
             cursor: pointer;
@@ -85,19 +95,14 @@
             gap: 6px;
         }
 
-        .btn-cam {
-            background-color: #0066ff;
-        }
-
-        .btn-gal {
-            background-color: #607d8b;
-        }
+        .btn-cam { background-color: #0066ff; }
+        .btn-gal { background-color: #607d8b; }
 
         .hint-text {
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 500;
         }
 
@@ -107,16 +112,14 @@
             color: #888;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            margin-bottom: 12px;
-            text-align: center;
+            margin-bottom: 10px;
         }
 
-        /* Lista de Competições */
-        .competition-list {
+        /* Competitions List */
+        .comp-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
         }
 
         .comp-item {
@@ -128,11 +131,6 @@
             justify-content: space-between;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
             cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .comp-item:hover, .comp-item.selected {
-            border: 2px solid #0066ff;
         }
 
         .comp-info {
@@ -141,75 +139,211 @@
             gap: 12px;
         }
 
-        .comp-flag {
-            font-size: 1.5rem;
-            width: 30px;
-            text-align: center;
-        }
+        .comp-details h4 { font-size: 0.88rem; color: #222; font-weight: 700; }
+        .comp-details p { font-size: 0.72rem; color: #888; }
+        .comp-count { font-size: 0.8rem; color: #0066ff; font-weight: 700; }
 
-        .comp-details h4 {
-            font-size: 0.9rem;
-            color: #222;
-            font-weight: 700;
-        }
-
-        .comp-details p {
-            font-size: 0.75rem;
-            color: #888;
-        }
-
-        .comp-count {
-            font-size: 0.8rem;
-            color: #0066ff;
-            font-weight: 700;
-        }
-
-        /* Área de Resultados */
-        .results-container {
+        /* Lista de Jogos */
+        .game-card {
             background: white;
             border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
 
-        .results-container h3 {
-            font-size: 0.85rem;
-            color: #0066ff;
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #666;
             margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .game-teams {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .more-markets-tag {
+            font-size: 0.7rem;
+            color: #0066ff;
+            background: #eef6ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .odds-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .odd-btn {
+            background: #f0f3f6;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .odd-btn.selected {
+            background-color: #28a745 !important;
+            color: white !important;
+            border-color: #28a745 !important;
+        }
+
+        /* MODAL DOS MERCADOS SECUNDÁRIOS */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 100;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            max-height: 80%;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-title { font-size: 0.95rem; font-weight: bold; color: #111; }
+        .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888; }
+
+        .market-group-title {
+            font-size: 0.75rem;
+            color: #0066ff;
+            font-weight: bold;
+            margin: 12px 0 6px 0;
             text-transform: uppercase;
         }
 
-        pre {
-            white-space: pre-wrap;
-            font-family: monospace;
-            font-size: 0.85rem;
-            color: #333;
-            max-height: 150px;
-            overflow-y: auto;
+        /* Ficha de Apostas & Combinação */
+        .ticket-box {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        #preview-img {
-            width: 100%;
-            max-height: 180px;
-            object-fit: contain;
+        .ticket-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            font-size: 0.82rem;
+        }
+
+        .badge-prog {
+            background: #28a745;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 3px;
+        }
+
+        .combo-summary {
+            background: #eef6ff;
             border-radius: 8px;
-            margin-bottom: 10px;
-            display: none;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #0066ff;
+            font-weight: bold;
         }
 
-        /* Bottom Bar */
+        .stake-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #0066ff;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .receipt {
+            background: #fff;
+            border: 2px dashed #0066ff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .qr-mock {
+            width: 120px;
+            height: 120px;
+            margin: 15px auto;
+            background: #111;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.65rem;
+            word-break: break-all;
+        }
+
+        /* Bottom Nav */
         .bottom-nav {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             background-color: #0066ff;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 0;
-            height: 55px;
+            height: 60px;
+            z-index: 20;
         }
 
         .nav-item {
@@ -218,24 +352,15 @@
             flex-direction: column;
             align-items: center;
             font-size: 0.65rem;
-            text-decoration: none;
             cursor: pointer;
         }
 
-        .nav-item.active {
-            color: white;
-        }
+        .nav-item.active { color: white; font-weight: bold; }
+        .nav-item .icon { font-size: 1.1rem; margin-bottom: 2px; }
 
-        .nav-item .icon {
-            font-size: 1.1rem;
-            margin-bottom: 2px;
-        }
-
-        /* Botão Rosa Central de Câmara */
         .nav-cam-btn {
             background-color: #e91e63;
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -254,116 +379,192 @@
 <body>
 
     <div class="app-card">
-        <!-- Topo da Aplicação -->
+        <!-- Header -->
         <div class="app-header">
-            <div class="title">
-                ⚽ Zona Fichas Rápidas
+            <div style="display: flex; align-items: center;">
+                <button id="btnBack" class="btn-back" onclick="voltarHome()">⬅</button>
+                <div class="title" id="headerTitle">⚽ Zona Fichas Rápidas</div>
             </div>
-            <div class="search-icon">🔍</div>
+            <div>🔍</div>
         </div>
 
-        <!-- Corpo Principal -->
+        <!-- Body -->
         <div class="app-body">
-            <!-- Botões Superiores -->
-            <div class="action-buttons">
-                <button class="btn-action btn-cam" onclick="document.getElementById('camInput').click()">
-                    📷 Abrir Câmara
-                </button>
-                <button class="btn-action btn-gal" onclick="document.getElementById('galInput').click()">
-                    📁 Carregar Foto
-                </button>
+
+            <!-- 1. HOME / COMPETIÇÕES -->
+            <div id="viewHome" class="view-section active">
+                <div class="action-buttons">
+                    <button class="btn-action btn-cam" onclick="document.getElementById('camInput').click()">
+                        📷 Tirar Foto (Ficha)
+                    </button>
+                    <button class="btn-action btn-gal" onclick="document.getElementById('galInput').click()">
+                        📁 Carregar Foto
+                    </button>
+                </div>
+                <p class="hint-text">Exemplo no papel: <b>101 - 1X, +2.5, GG</b></p>
+
+                <div id="ocrResultBox" style="display:none; background:white; padding:10px; border-radius:10px; margin-bottom:15px; border:1px solid #0066ff;">
+                    <h4 style="color:#0066ff; font-size:0.8rem;">📄 RELATÓRIO DA LEITURA:</h4>
+                    <pre id="ocrText" style="font-size:0.8rem; margin-top:5px; color:#333; white-space: pre-wrap;"></pre>
+                </div>
+
+                <div class="section-title">MELHORES COMPETIÇÕES</div>
+                <div class="comp-list">
+                    <div class="comp-item" onclick="abrirLiga('champions')">
+                        <div class="comp-info">
+                            <span>🇪🇺</span>
+                            <div class="comp-details">
+                                <h4>Liga dos Campeões UEFA</h4>
+                                <p>Futebol - Internacional</p>
+                            </div>
+                        </div>
+                        <span class="comp-count">8 jogos</span>
+                    </div>
+
+                    <div class="comp-item" onclick="abrirLiga('girabola')">
+                        <div class="comp-info">
+                            <span>🇦🇴</span>
+                            <div class="comp-details">
+                                <h4>Girabola Angola</h4>
+                                <p>Futebol - Angola</p>
+                            </div>
+                        </div>
+                        <span class="comp-count">8 jogos</span>
+                    </div>
+
+                    <div class="comp-item" onclick="abrirLiga('premier')">
+                        <div class="comp-info">
+                            <span>🇬🇧</span>
+                            <div class="comp-details">
+                                <h4>Premier League</h4>
+                                <p>Futebol - Inglaterra</p>
+                            </div>
+                        </div>
+                        <span class="comp-count">8 jogos</span>
+                    </div>
+
+                    <div class="comp-item" onclick="abrirLiga('laliga')">
+                        <div class="comp-info">
+                            <span>🇪🇸</span>
+                            <div class="comp-details">
+                                <h4>La Liga</h4>
+                                <p>Futebol - Espanha</p>
+                            </div>
+                        </div>
+                        <span class="comp-count">8 jogos</span>
+                    </div>
+
+                    <div class="comp-item" onclick="abrirLiga('portugal')">
+                        <div class="comp-info">
+                            <span>🇵🇹</span>
+                            <div class="comp-details">
+                                <h4>Liga Portugal</h4>
+                                <p>Futebol - Portugal</p>
+                            </div>
+                        </div>
+                        <span class="comp-count">8 jogos</span>
+                    </div>
+                </div>
             </div>
 
-            <p class="hint-text">Escreva no papel no formato Jogo - Prognóstico (ex: 1001 - 1 ou 2001 - X2)</p>
+            <!-- 2. JOGOS DA LIGA -->
+            <div id="viewGames" class="view-section">
+                <div id="gamesContainer"></div>
+            </div>
 
-            <input type="file" id="camInput" accept="image/*" capture="environment" onchange="processarFicha(event)">
-            <input type="file" id="galInput" accept="image/*" onchange="processarFicha(event)">
-
-            <!-- Lista de Competições com Contagem de Jogos -->
-            <div class="section-title">MELHORES COMPETIÇÕES</div>
-            <div class="competition-list">
-                <div class="comp-item" onclick="selecionarLiga('Liga dos Campeões UEFA')">
-                    <div class="comp-info">
-                        <span class="comp-flag">🇪🇺</span>
-                        <div class="comp-details">
-                            <h4>Liga dos Campeões UEFA</h4>
-                            <p>Futebol - Clubes Internacionais</p>
-                        </div>
+            <!-- 3. DESPORTOS -->
+            <div id="viewSports" class="view-section">
+                <div class="section-title">DESPORTOS DISPONÍVEIS</div>
+                <div class="comp-list">
+                    <div class="comp-item" onclick="abrirLiga('girabola')">
+                        <div class="comp-info"><span>⚽</span><div class="comp-details"><h4>Futebol</h4><p>40 Jogos Ativos</p></div></div>
                     </div>
-                    <span class="comp-count">2 jogos</span>
-                </div>
-
-                <div class="comp-item" onclick="selecionarLiga('Girabola Angola')">
-                    <div class="comp-info">
-                        <span class="comp-flag">🇦🇴</span>
-                        <div class="comp-details">
-                            <h4>Girabola Angola</h4>
-                            <p>Futebol - Angola</p>
-                        </div>
+                    <div class="comp-item">
+                        <div class="comp-info"><span>🏀</span><div class="comp-details"><h4>Basquetebol</h4><p>12 Jogos Ativos</p></div></div>
                     </div>
-                    <span class="comp-count">2 jogos</span>
-                </div>
-
-                <div class="comp-item" onclick="selecionarLiga('Premier League')">
-                    <div class="comp-info">
-                        <span class="comp-flag">🇬🇧</span>
-                        <div class="comp-details">
-                            <h4>Premier League</h4>
-                            <p>Futebol - Inglaterra</p>
-                        </div>
+                    <div class="comp-item">
+                        <div class="comp-info"><span>🎾</span><div class="comp-details"><h4>Ténis</h4><p>8 Jogos Ativos</p></div></div>
                     </div>
-                    <span class="comp-count">8 jogos</span>
-                </div>
-
-                <div class="comp-item" onclick="selecionarLiga('La Liga')">
-                    <div class="comp-info">
-                        <span class="comp-flag">🇪🇸</span>
-                        <div class="comp-details">
-                            <h4>La Liga</h4>
-                            <p>Futebol - Espanha</p>
-                        </div>
+                    <div class="comp-item">
+                        <div class="comp-info"><span>🏃</span><div class="comp-details"><h4>Futsal</h4><p>5 Jogos Ativos</p></div></div>
                     </div>
-                    <span class="comp-count">8 jogos</span>
-                </div>
-
-                <div class="comp-item" onclick="selecionarLiga('Liga Portugal')">
-                    <div class="comp-info">
-                        <span class="comp-flag">🇵🇹</span>
-                        <div class="comp-details">
-                            <h4>Liga Portugal</h4>
-                            <p>Futebol - Portugal</p>
-                        </div>
+                    <div class="comp-item">
+                        <div class="comp-info"><span>🤾</span><div class="comp-details"><h4>Andebol</h4><p>6 Jogos Ativos</p></div></div>
                     </div>
-                    <span class="comp-count">8 jogos</span>
                 </div>
             </div>
 
-            <!-- Imagem e Resultado da Leitura OCR -->
-            <div id="resultsCard" class="results-container">
-                <img id="preview-img" src="" alt="Ficha">
-                <h3 id="statusText">⏳ A processar...</h3>
-                <pre id="parsedOutput"></pre>
+            <!-- 4. CALENDÁRIO -->
+            <div id="viewCalendar" class="view-section">
+                <div class="section-title">CALENDÁRIO DE TODOS OS JOGOS</div>
+                <div id="calendarContainer"></div>
+            </div>
+
+            <!-- 5. FICHA DE APOSTAS & COMBINAÇÃO -->
+            <div id="viewTicket" class="view-section">
+                <div class="section-title">SUA FICHA DE APOSTAS / COMBINAÇÃO</div>
+                <div class="ticket-box">
+                    <div id="ticketItemsContainer">Nenhuma aposta selecionada.</div>
+                    
+                    <div id="comboSummary" class="combo-summary" style="display:none;"></div>
+
+                    <div id="ticketForm" style="display:none; margin-top:15px;">
+                        <label style="font-size:0.8rem; font-weight:bold; color:#555;">Valor da Aposta (Kz):</label>
+                        <input type="number" id="stakeValue" class="stake-input" value="1000" oninput="calcularGanhos()">
+                        <div id="potentialPayout" style="text-align:center; font-weight:bold; color:#28a745; margin-bottom:10px; font-size:0.9rem;">
+                            Retorno Possível: 0 Kz
+                        </div>
+                        <button class="btn-submit" onclick="submeterFicha()">SUBMETER FICHA COMBINADA</button>
+                    </div>
+                </div>
+
+                <div id="receiptContainer" style="display:none; margin-top:15px;">
+                    <div class="receipt">
+                        <h3 style="color:#0066ff;">ELEPHANT BET / ZONA RÁPIDAS</h3>
+                        <p style="font-size:0.75rem; color:#666;">Ficha Validada!</p>
+                        
+                        <div class="qr-mock">[QR CODE ELETRÓNICO]</div>
+
+                        <p id="receiptCode" style="font-size:0.85rem; font-weight:bold;"></p>
+                        <p id="receiptDetails" style="font-size:0.75rem; margin-top:5px; color:#333;"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL DE OUTROS MERCADOS -->
+        <div id="marketsModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="modalGameTitle">Mercados do Jogo</div>
+                    <button class="btn-close" onclick="fecharModal()">✖</button>
+                </div>
+                <div id="modalMarketsBody"></div>
             </div>
         </div>
 
-        <!-- Menu de Navegação Inferior (Bottom Nav) -->
+        <input type="file" id="camInput" accept="image/*" capture="environment" onchange="processarFicha(event)">
+        <input type="file" id="galInput" accept="image/*" onchange="processarFicha(event)">
+
+        <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item active">
+            <div class="nav-item active" onclick="navegar('home')">
                 <span class="icon">🏠</span>
                 <span>Home</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="navegar('sports')">
                 <span class="icon">⚽</span>
                 <span>Desportos</span>
             </div>
             <div class="nav-cam-btn" onclick="document.getElementById('camInput').click()">
                 📷
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="navegar('calendar')">
                 <span class="icon">📅</span>
                 <span>Calendário</span>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="navegar('ticket')">
                 <span class="icon">📋</span>
                 <span>Fichas</span>
             </div>
@@ -372,32 +573,273 @@
 
     <script>
         const GOOGLE_VISION_API_KEY = 'AIzaSyBDS05EdjeiG4ht4Y5GO9NHUpZR16mrvWc';
-        let ligaSelecionada = 'Geral';
 
-        function selecionarLiga(nomeLiga) {
-            ligaSelecionada = nomeLiga;
-            alert('Liga selecionada: ' + nomeLiga);
+        const database = {
+            girabola: [
+                { id: 101, home: 'Petro de Luanda', away: '1º de Agosto' },
+                { id: 102, home: 'Sagrada Esperança', away: 'Kabuscorp' },
+                { id: 103, home: 'Interclube', away: 'Wiliete de Benguela' },
+                { id: 104, home: 'Bravos do Maquis', away: 'Académica do Lobito' },
+                { id: 105, home: 'Desportivo da Huíla', away: 'Santa Rita' },
+                { id: 106, home: 'São Salvador', away: 'Luanda City' },
+                { id: 107, home: 'Desportivo da Lunda Sul', away: 'Isaac de Benguela' },
+                { id: 108, home: 'Carmona FC', away: 'Recreativo do Libolo' }
+            ],
+            champions: [
+                { id: 201, home: 'Real Madrid', away: 'Manchester City' },
+                { id: 202, home: 'Bayern Munique', away: 'PSG' },
+                { id: 203, home: 'Barcelona', away: 'Inter de Milão' },
+                { id: 204, home: 'Arsenal', away: 'Juventus' },
+                { id: 205, home: 'Bayer Leverkusen', away: 'Atletico Madrid' },
+                { id: 206, home: 'Liverpool', away: 'AC Milan' },
+                { id: 207, home: 'Dortmund', away: 'Benfica' },
+                { id: 208, home: 'Atalanta', away: 'Sporting CP' }
+            ],
+            premier: [
+                { id: 301, home: 'Chelsea', away: 'Tottenham' },
+                { id: 302, home: 'Manchester United', away: 'Newcastle' },
+                { id: 303, home: 'Aston Villa', away: 'Brighton' },
+                { id: 304, home: 'West Ham', away: 'Everton' },
+                { id: 305, home: 'Fulham', away: 'Brentford' },
+                { id: 306, home: 'Bournemouth', away: 'Crystal Palace' },
+                { id: 307, home: 'Wolves', away: 'Leicester' },
+                { id: 308, home: 'Ipswich', away: 'Southampton' }
+            ],
+            laliga: [
+                { id: 401, home: 'Sevilla', away: 'Betis' },
+                { id: 402, home: 'Athletic Bilbao', away: 'Real Sociedad' },
+                { id: 403, home: 'Villarreal', away: 'Valencia' },
+                { id: 404, home: 'Girona', away: 'Osasuna' },
+                { id: 405, home: 'Celta de Vigo', away: 'Getafe' },
+                { id: 406, home: 'Rayo Vallecano', away: 'Mallorca' },
+                { id: 407, home: 'Espanyol', away: 'Alavés' },
+                { id: 408, home: 'Las Palmas', away: 'Leganés' }
+            ],
+            portugal: [
+                { id: 501, home: 'Porto', away: 'Braga' },
+                { id: 502, home: 'Vitoria de Guimarães', away: 'Boavista' },
+                { id: 503, home: 'Famalicão', away: 'Rio Ave' },
+                { id: 504, home: 'Gil Vicente', away: 'Arouca' },
+                { id: 505, home: 'Moreirense', away: 'Estoril' },
+                { id: 506, home: 'Casa Pia', away: 'Farense' },
+                { id: 507, home: 'AVS', away: 'Nacional' },
+                { id: 508, home: 'Santa Clara', away: 'Estrela da Amadora' }
+            ]
+        };
+
+        let selecoesApostas = {};
+        let jogoModalAtual = null;
+
+        function navegar(aba) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('btnBack').style.display = 'none';
+
+            if (aba === 'home') {
+                document.getElementById('viewHome').classList.add('active');
+                document.getElementById('headerTitle').innerText = '⚽ Zona Fichas Rápidas';
+            } else if (aba === 'sports') {
+                document.getElementById('viewSports').classList.add('active');
+                document.getElementById('headerTitle').innerText = '⚽ Desportos';
+            } else if (aba === 'calendar') {
+                document.getElementById('viewCalendar').classList.add('active');
+                document.getElementById('headerTitle').innerText = '📅 Calendário';
+                carregarCalendario();
+            } else if (aba === 'ticket') {
+                document.getElementById('viewTicket').classList.add('active');
+                document.getElementById('headerTitle').innerText = '📋 Minha Ficha';
+                atualizarVistaFicha();
+            }
+        }
+
+        function voltarHome() { navegar('home'); }
+
+        function abrirLiga(chaveLiga) {
+            const jogos = database[chaveLiga];
+            const container = document.getElementById('gamesContainer');
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('viewGames').classList.add('active');
+            document.getElementById('btnBack').style.display = 'block';
+            document.getElementById('headerTitle').innerText = chaveLiga.toUpperCase();
+
+            container.innerHTML = '';
+            jogos.forEach(jogo => {
+                const progsAtuais = selecoesApostas[jogo.id] || [];
+                container.innerHTML += `
+                    <div class="game-card">
+                        <div class="game-header">
+                            <span>Jogo Nº: <b>${jogo.id}</b></span>
+                            <span>Hoje 16:00</span>
+                        </div>
+                        <div class="game-teams" onclick="abrirModalMercados(${jogo.id}, '${jogo.home}', '${jogo.away}')">
+                            <span>${jogo.home} vs ${jogo.away}</span>
+                            <span class="more-markets-tag">+ Mercados</span>
+                        </div>
+                        <div class="odds-grid">
+                            <button class="odd-btn ${progsAtuais.includes('1') ? 'selected' : ''}" onclick="toggleAposta(${jogo.id}, '1', this)">1</button>
+                            <button class="odd-btn ${progsAtuais.includes('X') ? 'selected' : ''}" onclick="toggleAposta(${jogo.id}, 'X', this)">X</button>
+                            <button class="odd-btn ${progsAtuais.includes('2') ? 'selected' : ''}" onclick="toggleAposta(${jogo.id}, '2', this)">2</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ABRIR POPUP DOS OUTROS MERCADOS DO JOGO
+        function abrirModalMercados(jogoId, home, away) {
+            jogoModalAtual = jogoId;
+            document.getElementById('modalGameTitle').innerText = `Jº ${jogoId}: ${home} vs ${away}`;
+            
+            const progsAtuais = selecoesApostas[jogoId] || [];
+            const body = document.getElementById('modalMarketsBody');
+
+            body.innerHTML = `
+                <div class="market-group-title">Dupla Possibilidade</div>
+                <div class="odds-grid">
+                    <button class="odd-btn ${progsAtuais.includes('1X') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, '1X', this)">1X</button>
+                    <button class="odd-btn ${progsAtuais.includes('12') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, '12', this)">12</button>
+                    <button class="odd-btn ${progsAtuais.includes('X2') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, 'X2', this)">X2</button>
+                </div>
+
+                <div class="market-group-title">Total de Golos (Over / Under)</div>
+                <div class="odds-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <button class="odd-btn ${progsAtuais.includes('+1.5') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, '+1.5', this)">Mais 1.5 (+1.5)</button>
+                    <button class="odd-btn ${progsAtuais.includes('-1.5') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, '-1.5', this)">Menos 1.5 (-1.5)</button>
+                </div>
+                <div class="odds-grid" style="grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="odd-btn ${progsAtuais.includes('+2.5') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, '+2.5', this)">Mais 2.5 (+2.5)</button>
+                    <button class="odd-btn ${progsAtuais.includes('-2.5') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, '-2.5', this)">Menos 2.5 (-2.5)</button>
+                </div>
+
+                <div class="market-group-title">Ambas Marcam</div>
+                <div class="odds-grid" style="grid-template-columns: 1fr 1fr;">
+                    <button class="odd-btn ${progsAtuais.includes('GG') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, 'GG', this)">Sim (GG)</button>
+                    <button class="odd-btn ${progsAtuais.includes('NG') ? 'selected' : ''}" onclick="toggleApostaModal(${jogoId}, 'NG', this)">Não (NG)</button>
+                </div>
+            `;
+
+            document.getElementById('marketsModal').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('marketsModal').classList.remove('active');
+        }
+
+        function toggleApostaModal(jogoId, prognostico, btn) {
+            toggleAposta(jogoId, prognostico, btn);
+        }
+
+        function toggleAposta(jogoId, prognostico, btn) {
+            if (!selecoesApostas[jogoId]) {
+                selecoesApostas[jogoId] = [];
+            }
+
+            const idx = selecoesApostas[jogoId].indexOf(prognostico);
+            if (idx > -1) {
+                selecoesApostas[jogoId].splice(idx, 1);
+                if (btn) btn.classList.remove('selected');
+                if (selecoesApostas[jogoId].length === 0) {
+                    delete selecoesApostas[jogoId];
+                }
+            } else {
+                selecoesApostas[jogoId].push(prognostico);
+                if (btn) btn.classList.add('selected');
+            }
+        }
+
+        function atualizarVistaFicha() {
+            const container = document.getElementById('ticketItemsContainer');
+            const form = document.getElementById('ticketForm');
+            const comboSummary = document.getElementById('comboSummary');
+            const chaves = Object.keys(selecoesApostas);
+
+            if (chaves.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Nenhuma aposta selecionada na ficha.</p>';
+                form.style.display = 'none';
+                comboSummary.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            let totalCombinacoes = 1;
+
+            chaves.forEach(jogoId => {
+                const progs = selecoesApostas[jogoId];
+                totalCombinacoes *= progs.length;
+
+                const badges = progs.map(p => `<span class="badge-prog">${p}</span>`).join(' ');
+
+                html += `
+                    <div class="ticket-item">
+                        <div><b>Jogo Nº ${jogoId}</b></div>
+                        <div>Prognósticos: ${badges}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            comboSummary.innerHTML = `🔥 APOSTA COMBINADA MULTI<br>Total de Jogos: ${chaves.length} | Combinações Geradas: ${totalCombinacoes}`;
+            comboSummary.style.display = 'block';
+
+            form.style.display = 'block';
+            calcularGanhos();
+        }
+
+        function calcularGanhos() {
+            const chaves = Object.keys(selecoesApostas);
+            let totalCombinacoes = 1;
+            chaves.forEach(id => totalCombinacoes *= selecoesApostas[id].length);
+
+            const valorAposta = parseFloat(document.getElementById('stakeValue').value) || 0;
+            const oddEstimada = Math.pow(1.80, chaves.length) * totalCombinacoes;
+            const retorno = Math.round(valorAposta * oddEstimada);
+            
+            document.getElementById('potentialPayout').innerText = `Retorno Possível: ${retorno.toLocaleString('pt-AO')} Kz`;
+        }
+
+        function submeterFicha() {
+            const valor = document.getElementById('stakeValue').value;
+            const codAleatorio = 'ELEPH-' + Math.floor(100000 + Math.random() * 900000);
+            
+            document.getElementById('ticketForm').style.display = 'none';
+            document.getElementById('comboSummary').style.display = 'none';
+            document.getElementById('receiptContainer').style.display = 'block';
+            document.getElementById('receiptCode').innerText = 'CÓDIGO DA FICHA: ' + codAleatorio;
+            document.getElementById('receiptDetails').innerText = `Jogos: ${Object.keys(selecoesApostas).length} | Valor: ${valor} Kz`;
+        }
+
+        function carregarCalendario() {
+            const container = document.getElementById('calendarContainer');
+            let html = '';
+            Object.keys(database).forEach(liga => {
+                database[liga].forEach(jogo => {
+                    html += `
+                        <div class="game-card">
+                            <div class="game-header">
+                                <span>CÓDIGO: <b style="color:#0066ff">${jogo.id}</b></span>
+                                <span>COMPETIÇÃO: ${liga.toUpperCase()}</span>
+                            </div>
+                            <div class="game-teams">${jogo.home} vs ${jogo.away}</div>
+                        </div>
+                    `;
+                });
+            });
+            container.innerHTML = html;
         }
 
         async function processarFicha(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const resultsCard = document.getElementById('resultsCard');
-            const previewImg = document.getElementById('preview-img');
-            const statusText = document.getElementById('statusText');
-            const parsedOutput = document.getElementById('parsedOutput');
-
-            resultsCard.style.display = 'block';
-            previewImg.src = URL.createObjectURL(file);
-            previewImg.style.display = 'block';
-
-            statusText.innerText = "⏳ A ler ficha com Google Vision...";
-            parsedOutput.innerText = "A extrair apostas...";
+            navegar('home');
+            const ocrBox = document.getElementById('ocrResultBox');
+            const ocrText = document.getElementById('ocrText');
+            ocrBox.style.display = 'block';
+            ocrText.innerText = "⏳ A analisar imagem com Google Cloud Vision...";
 
             try {
                 const base64Clean = await convertToBase64(file);
-
                 const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -410,46 +852,48 @@
                 });
 
                 const data = await response.json();
-
                 if (data.responses && data.responses[0].fullTextAnnotation) {
-                    const textoExtraido = data.responses[0].fullTextAnnotation.text;
-                    statusText.innerText = "✅ Leitura Concluída!";
+                    const texto = data.responses[0].fullTextAnnotation.text;
+                    const regex = /\b([0-9]{3,4})\s*[-–—.]\s*([0-9A-Za-z.,\s+]+)\b/g;
+                    
+                    let match;
+                    let novosJogos = 0;
+                    let listaDetalhada = [];
 
-                    // Filtro inteligente pelo travessão
-                    extrairApostas(textoExtraido);
-                } else {
-                    statusText.innerText = "⚠️ Erro na leitura";
-                    parsedOutput.innerText = "Não foi possível extrair texto da imagem.";
+                    while ((match = regex.exec(texto)) !== null) {
+                        const id = match[1];
+                        const progsRaw = match[2];
+
+                        const progsArray = progsRaw.split(',')
+                                                  .map(p => p.trim().toUpperCase())
+                                                  .filter(p => p.length > 0);
+
+                        if (progsArray.length > 0) {
+                            if (!selecoesApostas[id]) {
+                                selecoesApostas[id] = [];
+                                novosJogos++;
+                            }
+
+                            progsArray.forEach(p => {
+                                if (!selecoesApostas[id].includes(p)) {
+                                    selecoesApostas[id].push(p);
+                                }
+                            });
+
+                            listaDetalhada.push(`${id} - ${progsArray.join(', ')}`);
+                        }
+                    }
+
+                    if (novosJogos > 0 || listaDetalhada.length > 0) {
+                        ocrText.innerText = `✅ LEITURA DE COMBINAÇÕES CONCLUÍDA!\n` +
+                                           `📋 Jogos Identificados na foto:\n\n` + 
+                                           listaDetalhada.join('\n');
+                    } else {
+                        ocrText.innerText = "⚠️ Nenhum formato 'Jogo - Prog1, Prog2' reconhecido na foto.";
+                    }
                 }
-
-            } catch (error) {
-                statusText.innerText = "❌ Erro na API";
-                parsedOutput.innerText = error.message;
-            }
-        }
-
-        function extrairApostas(texto) {
-            const parsedOutput = document.getElementById('parsedOutput');
-            const linhas = texto.split('\n');
-            const regexTravessao = /\b([0-9A-Za-z]+)\s*[-–—.]\s*([0-9A-Za-z.,]+)\b/g;
-
-            let apostas = [];
-
-            linhas.forEach((linha) => {
-                let match;
-                while ((match = regexTravessao.exec(linha)) !== null) {
-                    apostas.push(`${match[1].trim()} - ${match[2].trim()}`);
-                }
-            });
-
-            if (apostas.length > 0) {
-                parsedOutput.innerText = `COMPETIÇÃO: ${ligaSelecionada.toUpperCase()}\n` +
-                                         `TOTAL: ${apostas.length} APOSTAS\n\n` + 
-                                         apostas.join('\n');
-            } else {
-                parsedOutput.innerText = `COMPETIÇÃO: ${ligaSelecionada.toUpperCase()}\n\n` +
-                                         `Texto lido:\n${texto}\n\n` +
-                                         `⚠️ Nenhuma linha no formato "Jogo - Prognóstico" reconhecida.`;
+            } catch (err) {
+                ocrText.innerText = "❌ Erro ao ler imagem: " + err.message;
             }
         }
 
