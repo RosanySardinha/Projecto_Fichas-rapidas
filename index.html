@@ -3,161 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zona Fichas Rápidas</title>
+    <title>Zona Fichas Rápidas - Leitor OCR</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            padding: 20px 15px;
+            background-color: #0d2342; /* Azul escuro do fundo */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 10px;
         }
 
-        .container {
+        .app-card {
             width: 100%;
-            max-width: 480px;
-            background-color: #1e293b;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            border: 1px solid #334155;
+            max-width: 420px;
+            background-color: #eef2f5;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+        /* Topo Azul */
+        .app-header {
+            background-color: #0066ff;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
-            font-size: 1.6rem;
-            color: #38bdf8;
+        .app-header .title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
             font-weight: 700;
         }
 
-        .header p {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            margin-top: 4px;
+        .app-header .search-icon {
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
-        .form-group {
-            margin-bottom: 18px;
+        /* Conteúdo Principal */
+        .app-body {
+            padding: 16px;
+            flex: 1;
+            padding-bottom: 70px; /* espaço para a bottom bar */
         }
 
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #38bdf8;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px;
-            background-color: #0f172a;
-            border: 1px solid #2563eb;
-            border-radius: 8px;
-            color: #f8fafc;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        select:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-        }
-
-        .upload-buttons {
+        /* Grid de Botões no Topo */
+        .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .btn-action {
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-cam {
+            background-color: #0066ff;
+        }
+
+        .btn-gal {
+            background-color: #607d8b;
+        }
+
+        .hint-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #888;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        /* Lista de Competições */
+        .competition-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
-        .btn {
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 700;
+        .comp-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
             cursor: pointer;
-            color: white;
-            text-align: center;
-            transition: transform 0.1s, opacity 0.2s;
+            transition: background 0.2s;
         }
 
-        .btn:active {
-            transform: scale(0.98);
+        .comp-item:hover, .comp-item.selected {
+            border: 2px solid #0066ff;
         }
 
-        .btn-camera {
-            background-color: #16a34a;
+        .comp-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .btn-gallery {
-            background-color: #2563eb;
-        }
-
-        #preview-container {
-            display: none;
-            margin-bottom: 18px;
+        .comp-flag {
+            font-size: 1.5rem;
+            width: 30px;
             text-align: center;
         }
 
-        #preview-img {
-            max-width: 100%;
-            max-height: 220px;
-            border-radius: 8px;
-            border: 2px solid #2563eb;
-            object-fit: contain;
-        }
-
-        .status {
-            text-align: center;
+        .comp-details h4 {
             font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            min-height: 20px;
-            color: #fbbf24;
-        }
-
-        .output-box {
-            background-color: #0f172a;
-            border: 1px solid #2563eb;
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 14px;
-        }
-
-        .output-box h2 {
-            font-size: 0.85rem;
+            color: #222;
             font-weight: 700;
-            color: #38bdf8;
+        }
+
+        .comp-details p {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .comp-count {
+            font-size: 0.8rem;
+            color: #0066ff;
+            font-weight: 700;
+        }
+
+        /* Área de Resultados */
+        .results-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .results-container h3 {
+            font-size: 0.85rem;
+            color: #0066ff;
             margin-bottom: 8px;
             text-transform: uppercase;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 4px;
         }
 
         pre {
             white-space: pre-wrap;
-            word-break: break-word;
             font-family: monospace;
-            font-size: 0.9rem;
-            color: #e2e8f0;
-            max-height: 180px;
+            font-size: 0.85rem;
+            color: #333;
+            max-height: 150px;
             overflow-y: auto;
+        }
+
+        #preview-img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* Bottom Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #0066ff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+            height: 55px;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.65rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        /* Botão Rosa Central de Câmara */
+        .nav-cam-btn {
+            background-color: #e91e63;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 3px solid #eef2f5;
+            margin-top: -20px;
+            cursor: pointer;
         }
 
         input[type="file"] { display: none; }
@@ -165,84 +253,147 @@
 </head>
 <body>
 
-    <div class="container">
-        <!-- Cabeçalho -->
-        <div class="header">
-            <h1>Zona Fichas Rápidas</h1>
-            <p>Digitalizador e leitor automático de fichas manuais</p>
+    <div class="app-card">
+        <!-- Topo da Aplicação -->
+        <div class="app-header">
+            <div class="title">
+                ⚽ Zona Fichas Rápidas
+            </div>
+            <div class="search-icon">🔍</div>
         </div>
 
-        <!-- Seletor de Liga -->
-        <div class="form-group">
-            <label for="leagueSelect">Selecionar Liga / Competição</label>
-            <select id="leagueSelect">
-                <option value="geral">Geral / Todas as Ligas</option>
-                <option value="angola">Girabola (Angola)</option>
-                <option value="premier">Premier League (Inglaterra)</option>
-                <option value="laliga">La Liga (Espanha)</option>
-                <option value="seriea">Serie A (Itália)</option>
-                <option value="ligaportugal">Liga Portugal</option>
-                <option value="champions">UEFA Champions League</option>
-            </select>
+        <!-- Corpo Principal -->
+        <div class="app-body">
+            <!-- Botões Superiores -->
+            <div class="action-buttons">
+                <button class="btn-action btn-cam" onclick="document.getElementById('camInput').click()">
+                    📷 Abrir Câmara
+                </button>
+                <button class="btn-action btn-gal" onclick="document.getElementById('galInput').click()">
+                    📁 Carregar Foto
+                </button>
+            </div>
+
+            <p class="hint-text">Escreva no papel no formato Jogo - Prognóstico (ex: 1001 - 1 ou 2001 - X2)</p>
+
+            <input type="file" id="camInput" accept="image/*" capture="environment" onchange="processarFicha(event)">
+            <input type="file" id="galInput" accept="image/*" onchange="processarFicha(event)">
+
+            <!-- Lista de Competições com Contagem de Jogos -->
+            <div class="section-title">MELHORES COMPETIÇÕES</div>
+            <div class="competition-list">
+                <div class="comp-item" onclick="selecionarLiga('Liga dos Campeões UEFA')">
+                    <div class="comp-info">
+                        <span class="comp-flag">🇪🇺</span>
+                        <div class="comp-details">
+                            <h4>Liga dos Campeões UEFA</h4>
+                            <p>Futebol - Clubes Internacionais</p>
+                        </div>
+                    </div>
+                    <span class="comp-count">2 jogos</span>
+                </div>
+
+                <div class="comp-item" onclick="selecionarLiga('Girabola Angola')">
+                    <div class="comp-info">
+                        <span class="comp-flag">🇦🇴</span>
+                        <div class="comp-details">
+                            <h4>Girabola Angola</h4>
+                            <p>Futebol - Angola</p>
+                        </div>
+                    </div>
+                    <span class="comp-count">2 jogos</span>
+                </div>
+
+                <div class="comp-item" onclick="selecionarLiga('Premier League')">
+                    <div class="comp-info">
+                        <span class="comp-flag">🇬🇧</span>
+                        <div class="comp-details">
+                            <h4>Premier League</h4>
+                            <p>Futebol - Inglaterra</p>
+                        </div>
+                    </div>
+                    <span class="comp-count">8 jogos</span>
+                </div>
+
+                <div class="comp-item" onclick="selecionarLiga('La Liga')">
+                    <div class="comp-info">
+                        <span class="comp-flag">🇪🇸</span>
+                        <div class="comp-details">
+                            <h4>La Liga</h4>
+                            <p>Futebol - Espanha</p>
+                        </div>
+                    </div>
+                    <span class="comp-count">8 jogos</span>
+                </div>
+
+                <div class="comp-item" onclick="selecionarLiga('Liga Portugal')">
+                    <div class="comp-info">
+                        <span class="comp-flag">🇵🇹</span>
+                        <div class="comp-details">
+                            <h4>Liga Portugal</h4>
+                            <p>Futebol - Portugal</p>
+                        </div>
+                    </div>
+                    <span class="comp-count">8 jogos</span>
+                </div>
+            </div>
+
+            <!-- Imagem e Resultado da Leitura OCR -->
+            <div id="resultsCard" class="results-container">
+                <img id="preview-img" src="" alt="Ficha">
+                <h3 id="statusText">⏳ A processar...</h3>
+                <pre id="parsedOutput"></pre>
+            </div>
         </div>
 
-        <!-- Botões -->
-        <div class="upload-buttons">
-            <button class="btn btn-camera" onclick="document.getElementById('camInput').click()">
-                📷 Tirar Foto
-            </button>
-            <button class="btn btn-gallery" onclick="document.getElementById('galInput').click()">
-                📁 Galeria
-            </button>
-        </div>
-
-        <input type="file" id="camInput" accept="image/*" capture="environment" onchange="processarFicha(event)">
-        <input type="file" id="galInput" accept="image/*" onchange="processarFicha(event)">
-
-        <!-- Preview da Foto -->
-        <div id="preview-container">
-            <img id="preview-img" src="" alt="Ficha de Aposta">
-        </div>
-
-        <!-- Mensagem de Estado -->
-        <div id="status" class="status"></div>
-
-        <!-- Resultados Filtrados (Aposta - Prognóstico) -->
-        <div class="output-box">
-            <h2>🎯 Apostas Filtradas (Aposta - Prognóstico)</h2>
-            <pre id="parsedOutput">Aguardando envio da ficha...</pre>
-        </div>
-
-        <!-- Texto Bruto do OCR -->
-        <div class="output-box">
-            <h2>📄 Texto Bruto Extraído (OCR)</h2>
-            <pre id="rawOutput">Aguardando envio da ficha...</pre>
+        <!-- Menu de Navegação Inferior (Bottom Nav) -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <span class="icon">🏠</span>
+                <span>Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="icon">⚽</span>
+                <span>Desportos</span>
+            </div>
+            <div class="nav-cam-btn" onclick="document.getElementById('camInput').click()">
+                📷
+            </div>
+            <div class="nav-item">
+                <span class="icon">📅</span>
+                <span>Calendário</span>
+            </div>
+            <div class="nav-item">
+                <span class="icon">📋</span>
+                <span>Fichas</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // 🔑 Tua Chave de API Google Cloud Vision
         const GOOGLE_VISION_API_KEY = 'AIzaSyBDS05EdjeiG4ht4Y5GO9NHUpZR16mrvWc';
+        let ligaSelecionada = 'Geral';
+
+        function selecionarLiga(nomeLiga) {
+            ligaSelecionada = nomeLiga;
+            alert('Liga selecionada: ' + nomeLiga);
+        }
 
         async function processarFicha(event) {
             const file = event.target.files[0];
             if (!file) return;
 
+            const resultsCard = document.getElementById('resultsCard');
             const previewImg = document.getElementById('preview-img');
-            const previewContainer = document.getElementById('preview-container');
-            const statusDiv = document.getElementById('status');
-            const parsedPre = document.getElementById('parsedOutput');
-            const rawPre = document.getElementById('rawOutput');
-            const liga = document.getElementById('leagueSelect').value;
+            const statusText = document.getElementById('statusText');
+            const parsedOutput = document.getElementById('parsedOutput');
 
-            // Exibe a foto
+            resultsCard.style.display = 'block';
             previewImg.src = URL.createObjectURL(file);
-            previewContainer.style.display = 'block';
+            previewImg.style.display = 'block';
 
-            statusDiv.style.color = '#fbbf24';
-            statusDiv.innerText = "⏳ A ler ficha manual com Google Vision...";
-            parsedPre.innerText = "A filtrar jogos...";
-            rawPre.innerText = "A ligar ao servidor...";
+            statusText.innerText = "⏳ A ler ficha com Google Vision...";
+            parsedOutput.innerText = "A extrair apostas...";
 
             try {
                 const base64Clean = await convertToBase64(file);
@@ -262,47 +413,43 @@
 
                 if (data.responses && data.responses[0].fullTextAnnotation) {
                     const textoExtraido = data.responses[0].fullTextAnnotation.text;
-                    statusDiv.style.color = '#4ade80';
-                    statusDiv.innerText = "✅ Leitura concluída com sucesso!";
-                    rawPre.innerText = textoExtraido;
+                    statusText.innerText = "✅ Leitura Concluída!";
 
-                    // Filtra o padrão Aposta - Prognóstico
-                    extrairApostasManual(textoExtraido, liga);
-                } else if (data.responses && data.responses[0].error) {
-                    statusDiv.style.color = '#f87171';
-                    statusDiv.innerText = "❌ Erro na API: " + data.responses[0].error.message;
+                    // Filtro inteligente pelo travessão
+                    extrairApostas(textoExtraido);
                 } else {
-                    statusDiv.style.color = '#f87171';
-                    statusDiv.innerText = "⚠️ Nenhum texto legível encontrado na imagem.";
+                    statusText.innerText = "⚠️ Erro na leitura";
+                    parsedOutput.innerText = "Não foi possível extrair texto da imagem.";
                 }
 
             } catch (error) {
-                console.error("Erro no processamento:", error);
-                statusDiv.style.color = '#f87171';
-                statusDiv.innerText = "❌ Erro ao enviar a imagem.";
+                statusText.innerText = "❌ Erro na API";
+                parsedOutput.innerText = error.message;
             }
         }
 
-        function extrairApostasManual(texto, liga) {
-            const parsedPre = document.getElementById('parsedOutput');
+        function extrairApostas(texto) {
+            const parsedOutput = document.getElementById('parsedOutput');
             const linhas = texto.split('\n');
-            const regexTravessao = /\b([0-9A-Za-z]+)\s*[-–—]\s*([0-9A-Za-z.,]+)\b/g;
+            const regexTravessao = /\b([0-9A-Za-z]+)\s*[-–—.]\s*([0-9A-Za-z.,]+)\b/g;
 
-            let apostasEncontradas = [];
+            let apostas = [];
 
             linhas.forEach((linha) => {
                 let match;
                 while ((match = regexTravessao.exec(linha)) !== null) {
-                    apostasEncontradas.push(`${match[1].trim()} - ${match[2].trim()}`);
+                    apostas.push(`${match[1].trim()} - ${match[2].trim()}`);
                 }
             });
 
-            if (apostasEncontradas.length > 0) {
-                let resultado = `[LIGA: ${liga.toUpperCase()}]\n[TOTAL: ${apostasEncontradas.length} JOGOS]\n\n`;
-                resultado += apostasEncontradas.join('\n');
-                parsedPre.innerText = resultado;
+            if (apostas.length > 0) {
+                parsedOutput.innerText = `COMPETIÇÃO: ${ligaSelecionada.toUpperCase()}\n` +
+                                         `TOTAL: ${apostas.length} APOSTAS\n\n` + 
+                                         apostas.join('\n');
             } else {
-                parsedPre.innerText = `[LIGA: ${liga.toUpperCase()}]\n\n⚠️ Nenhuma linha no formato "Aposta - Prognóstico" foi reconhecida.`;
+                parsedOutput.innerText = `COMPETIÇÃO: ${ligaSelecionada.toUpperCase()}\n\n` +
+                                         `Texto lido:\n${texto}\n\n` +
+                                         `⚠️ Nenhuma linha no formato "Jogo - Prognóstico" reconhecida.`;
             }
         }
 
