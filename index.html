@@ -828,6 +828,7 @@
             container.innerHTML = html;
         }
 
+        // PROCESSAMENTO DE IMAGEM OTIMIZADO E ULTRA-RÁPIDO
         async function processarFicha(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -836,10 +837,13 @@
             const ocrBox = document.getElementById('ocrResultBox');
             const ocrText = document.getElementById('ocrText');
             ocrBox.style.display = 'block';
-            ocrText.innerText = "⏳ A analisar imagem com Google Cloud Vision...";
+            ocrText.innerText = "⚡ A otimizar foto e a ler dados...";
 
             try {
-                const base64Clean = await convertToBase64(file);
+                // 1. Redimensiona e comprime no dispositivo antes do upload
+                const base64Clean = await comprimirEConverterImagem(file);
+
+                // 2. Envia pacote leve para a API da Google
                 const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -885,7 +889,7 @@
                     }
 
                     if (novosJogos > 0 || listaDetalhada.length > 0) {
-                        ocrText.innerText = `✅ LEITURA DE COMBINAÇÕES CONCLUÍDA!\n` +
+                        ocrText.innerText = `✅ LEITURA RÁPIDA CONCLUÍDA!\n` +
                                            `📋 Jogos Identificados na foto:\n\n` + 
                                            listaDetalhada.join('\n');
                     } else {
@@ -897,12 +901,48 @@
             }
         }
 
-        function convertToBase64(file) {
+        // Função para otimizar imagens gigantes antes do envio
+        function comprimirEConverterImagem(file) {
             return new Promise((resolve, reject) => {
+                const img = new Image();
                 const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    const maxDimension = 1200; // Resolução ideal para OCR rápido
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxDimension) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        }
+                    } else {
+                        if (height > maxDimension) {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Converte para JPEG com 70% de qualidade (extremamente leve)
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(dataUrl.split(',')[1]);
+                };
+
+                img.onerror = (error) => reject(error);
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = error => reject(error);
             });
         }
     </script>
