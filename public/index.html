@@ -1,70 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zona Fichas Rápidas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        #resultado {
-            margin-top: 15px;
-            text-align: left;
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 4px;
-            white-space: pre-wrap;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h2>Zona Fichas Rápidas</h2>
-        <p>Tira uma foto ou escolhe a imagem da ficha:</p>
-        
-        <input type="file" id="fotoFicha" accept="image/*" capture="environment">
-        <button id="btnLer">Ler Ficha com IA</button>
-
-        <div id="resultado">Aguardando imagem...</div>
-    </div>
-
-    <!-- Script externo carregado com segurança -->
-    <script src="script.js"></script>
-</body>
-</html>
+<html lang="pt"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Zona Fichas Rápidas</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body>
+<div id="app">
+<header><span style="font-size:24px">🎟️</span><h1>Zona Fichas Rápidas</h1><button data-a="sr" aria-label="Procurar">🔍</button></header>
+<div class="sp" id="sp"></div>
+<div id="main"></div>
+<nav>
+<button data-a="home"><span class="ic">🏠</span>Início</button>
+<button data-a="ficha"><span class="ic">🎫</span>Ficha<b id="nb" hidden></b></button>
+<button class="fab" data-a="scan" aria-label="Ler ficha com a câmara">📷</button>
+<button data-a="clr"><span class="ic">🗑️</span>Limpar</button>
+<button data-a="cfg"><span class="ic">⚙️</span>Definições</button>
+</nav>
+<div id="modal"></div>
+</div>
+<script src="app.js"></script></body></html>
